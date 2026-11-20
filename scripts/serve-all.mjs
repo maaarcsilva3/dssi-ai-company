@@ -17,6 +17,16 @@ const credentialsPath = path.join(
   "agent-serve",
   "credentials.json",
 );
+/** Local CLI from ai-company deps — not assumed on PATH. */
+const agentSdkEntry = path.join(
+  hqDir,
+  "node_modules",
+  "@grok",
+  "agent-sdk",
+  "dist",
+  "bin",
+  "agent-serve.js",
+);
 
 function fail(msg) {
   console.error(msg);
@@ -28,6 +38,18 @@ if (!existsSync(path.join(hqDir, "package.json"))) {
 }
 if (!existsSync(path.join(hqDir, "node_modules"))) {
   fail(`HQ deps missing. Run: cd ai-company && npm install`);
+}
+if (!existsSync(agentSdkEntry)) {
+  fail(
+    `agent-sdk CLI missing at ${agentSdkEntry}. Run: cd ai-company && npm install`,
+  );
+}
+
+function runAgentSdk(args, opts = {}) {
+  return spawnSync(process.execPath, [agentSdkEntry, ...args], {
+    cwd: hqDir,
+    ...opts,
+  });
 }
 
 function hasEnvCredential() {
@@ -44,11 +66,7 @@ function hasStoredCredentials() {
 
 /** agent-sdk whoami on Windows can print success then abort (UV assert). */
 function whoamiOk() {
-  const result = spawnSync("agent-sdk", ["whoami", "--json"], {
-    cwd: hqDir,
-    encoding: "utf8",
-    shell: true,
-  });
+  const result = runAgentSdk(["whoami", "--json"], { encoding: "utf8" });
   const out = `${result.stdout ?? ""}${result.stderr ?? ""}`;
   if (/not signed in/i.test(out)) return false;
 
@@ -85,11 +103,7 @@ function ensureLogin() {
   console.log("Opening browser sign-in… finish it, then HQ starts.");
   console.log("");
 
-  const login = spawnSync("agent-sdk", ["login"], {
-    cwd: hqDir,
-    stdio: "inherit",
-    shell: true,
-  });
+  const login = runAgentSdk(["login"], { stdio: "inherit" });
 
   if (isSignedIn()) {
     console.log("Login ok.");
@@ -113,12 +127,21 @@ console.log("Ctrl+C stops HQ.");
 console.log("");
 
 const child = spawn(
-  "agent-sdk",
-  ["serve", "--dir", ".", "--mode", "single", "--dev", "--port", "3000"],
+  process.execPath,
+  [
+    agentSdkEntry,
+    "serve",
+    "--dir",
+    ".",
+    "--mode",
+    "single",
+    "--dev",
+    "--port",
+    "3000",
+  ],
   {
     cwd: hqDir,
     stdio: "inherit",
-    shell: true,
     env: process.env,
   },
 );
