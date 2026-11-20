@@ -7,6 +7,7 @@ export const ROLE_IDS = [
   "designer",
   "marketer",
   "finance",
+  "chief-of-staff",
 ] as const;
 
 export type RoleId = (typeof ROLE_IDS)[number];
@@ -65,6 +66,12 @@ export const DEFAULT_ROSTER: RoleBrief[] = [
     title: "Finance",
     function:
       "Model budget, pricing assumptions, unit economics, and spend risk. Flag when the plan is financially thin.",
+  },
+  {
+    role: "chief-of-staff",
+    title: "Chief of Staff",
+    function:
+      "Capture, organize, verify, and surface organizational knowledge for the CEO and all AI employees. Own six duties: Conversation Recorder (important exchanges), Meeting Secretary (notes, action items, decisions), Knowledge Manager (two-layer raw evidence plus curated facts under company-workspace/knowledge/), Decision Tracker (decisions, reasoning, outcomes), Executive Assistant (tasks, deadlines, follow-ups), Intelligence Analyst (patterns, risks, opportunities, unresolved issues). Curated records always cite immutable raw sources; queue unverified items for CEO and PM review; never treat a summary as the only source of truth. Consumers: all AI employees by default.",
   },
 ];
 

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "ingested": {
+    "memory/journal.jsonl#ses_869ab70334550665a5c72713#2026-11-20T13:48:39.016Z": {
+      "id": "raw_chat_a54ae2db09eb1e6d",
+      "at": "2026-11-20T14:14:11.052Z"
+    },
+    "memory/journal.jsonl#ses_869ab70334550665a5c72713#2026-11-20T13:49:52.199Z": {
+      "id": "raw_chat_e772c5c2c8f5d6b8",
+      "at": "2026-11-20T14:14:11.053Z"
+    },
+    "memory/journal.jsonl#ses_869ab70334550665a5c72713#2026-11-20T13:59:48.277Z": {
+      "id": "raw_chat_4c3cb3276d75aa13",
+      "at": "2026-11-20T14:14:11.053Z"
+    },
+    "memory/journal.jsonl#ses_869ab70334550665a5c72713#2026-11-20T14:08:48.262Z": {
+      "id": "raw_chat_e0b21748e7aec230",
+      "at": "2026-11-20T14:14:11.054Z"
+    }
+  }
+}

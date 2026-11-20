@@ -7,7 +7,9 @@
     "check": "tsc --noEmit",
     "dev": "node ./scripts/ensure-login-and-serve.mjs",
     "serve": "node ./scripts/ensure-login-and-serve.mjs",
-    "login": "agent-sdk login"
+    "login": "agent-sdk login",
+    "knowledge:smoke": "node ./scripts/knowledge/kb.mjs smoke",
+    "knowledge:ingest": "node ./scripts/knowledge/kb.mjs ingest-journal"
   },
   "dependencies": {
     "@grok/agent-sdk": "^0.7.0",

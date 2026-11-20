@@ -4,7 +4,8 @@ export type RoleId =
   | "qa"
   | "designer"
   | "marketer"
-  | "finance";
+  | "finance"
+  | "chief-of-staff";
 
 export type Employee = {
   role: RoleId;

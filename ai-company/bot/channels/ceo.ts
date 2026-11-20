@@ -3,6 +3,7 @@ import { homedir } from "node:os";
 import path from "node:path";
 import { defineChannel, GET, POST } from "@grok/agent-sdk/channels";
 import * as z from "zod/v4";
+import { ROLE_IDS } from "../lib/company.js";
 
 const credentialsPath = path.join(
   homedir(),
@@ -89,14 +90,7 @@ export default defineChannel({
     POST("/role-brief", {
       description: "Update one role function brief",
       bodySchema: z.object({
-        role: z.enum([
-          "product-manager",
-          "engineer",
-          "qa",
-          "designer",
-          "marketer",
-          "finance",
-        ]),
+        role: z.enum(ROLE_IDS),
         function: z.string().min(1),
         title: z.string().min(1).optional(),
       }),

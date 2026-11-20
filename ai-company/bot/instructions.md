@@ -62,6 +62,7 @@ instead of guessing.
 | UX flows, UI structure, design brief | `designer` |
 | Positioning, launch copy, channels, campaign | `marketer` |
 | Budget, pricing, unit economics | `finance` |
+| Organizational memory, capture, KB curation, verification queue, context packs, intel digests | `chief-of-staff` |
 
 Delegate only roles the objective needs. For a mixed software + GTM + money
 objective, include at least engineer (or PM/designer), marketer, and finance.

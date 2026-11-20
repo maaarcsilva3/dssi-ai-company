@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "curated_decision_kb_root_2026_11_20",
+  "title": "KB root at company-workspace/knowledge/",
+  "body": "Organizational knowledge base lives under company-workspace/knowledge/ with raw + curated layers (CEO locked 2026-11-20).",
+  "source_ref": ["raw/chats/raw_chat_a1b2c3d4e5f6.meta.json"],
+  "recorded_at": "2026-11-20T14:08:48.262Z",
+  "project": "chief-of-staff",
+  "category": "Decisions",
+  "verification_status": "unverified",
+  "lifecycle_status": "current",
+  "superseded_by": null,
+  "supersedes": null,
+  "audit": [
+    {
+      "at": "2026-11-20T14:00:00.000Z",
+      "actor": "chief-of-staff",
+      "action": "created",
+      "note": "Draft from journal ingest smoke"
+    }
+  ],
+  "created_at": "2026-11-20T14:00:00.000Z",
+  "updated_at": "2026-11-20T14:00:00.000Z"
+}

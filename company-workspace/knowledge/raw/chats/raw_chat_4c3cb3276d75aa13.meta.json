@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "raw_chat_4c3cb3276d75aa13",
+  "kind": "chat",
+  "recorded_at": "2026-11-20T13:59:48.277Z",
+  "project": null,
+  "source_ref": "memory/journal.jsonl#line:3",
+  "content_path": "raw/chats/raw_chat_4c3cb3276d75aa13.json",
+  "ingested_at": "2026-11-20T14:14:11.053Z",
+  "category": null,
+  "verification_status": "n/a",
+  "lifecycle_status": "current"
+}

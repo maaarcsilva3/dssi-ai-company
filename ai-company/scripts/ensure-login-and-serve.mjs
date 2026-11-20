@@ -16,11 +16,28 @@ const credentialsPath = path.join(
   "agent-serve",
   "credentials.json",
 );
+/** Local CLI from this package's deps — not assumed on PATH. */
+const agentSdkEntry = path.join(
+  projectRoot,
+  "node_modules",
+  "@grok",
+  "agent-sdk",
+  "dist",
+  "bin",
+  "agent-serve.js",
+);
 const portFlagIndex = process.argv.indexOf("--port");
 const port =
   portFlagIndex >= 0 && process.argv[portFlagIndex + 1]
     ? process.argv[portFlagIndex + 1]
     : "3000";
+
+function runAgentSdk(args, opts = {}) {
+  return spawnSync(process.execPath, [agentSdkEntry, ...args], {
+    cwd: projectRoot,
+    ...opts,
+  });
+}
 
 function hasEnvCredential() {
   return Boolean(
@@ -36,11 +53,7 @@ function hasStoredCredentials() {
 
 /** agent-sdk whoami on Windows can print success then abort (UV assert). */
 function whoamiOk() {
-  const result = spawnSync("agent-sdk", ["whoami", "--json"], {
-    cwd: projectRoot,
-    encoding: "utf8",
-    shell: true,
-  });
+  const result = runAgentSdk(["whoami", "--json"], { encoding: "utf8" });
   const out = `${result.stdout ?? ""}${result.stderr ?? ""}`;
   if (/not signed in/i.test(out)) return false;
 
@@ -77,11 +90,7 @@ function ensureLogin() {
   console.log("Opening browser sign-in… finish it, then this script will continue.");
   console.log("");
 
-  const login = spawnSync("agent-sdk", ["login"], {
-    cwd: projectRoot,
-    stdio: "inherit",
-    shell: true,
-  });
+  const login = runAgentSdk(["login"], { stdio: "inherit" });
 
   if (isSignedIn()) {
     console.log("Login ok. Starting HQ…");
@@ -97,15 +106,31 @@ function ensureLogin() {
   process.exit(1);
 }
 
+if (!existsSync(agentSdkEntry)) {
+  console.error(
+    `agent-sdk CLI missing at ${agentSdkEntry}. Run: npm install`,
+  );
+  process.exit(1);
+}
+
 ensureLogin();
 
 const child = spawn(
-  "agent-sdk",
-  ["serve", "--dir", ".", "--mode", "single", "--dev", "--port", port],
+  process.execPath,
+  [
+    agentSdkEntry,
+    "serve",
+    "--dir",
+    ".",
+    "--mode",
+    "single",
+    "--dev",
+    "--port",
+    port,
+  ],
   {
     cwd: projectRoot,
     stdio: "inherit",
-    shell: true,
   },
 );
 
