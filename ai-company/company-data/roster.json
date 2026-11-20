@@ -1,0 +1,32 @@
+[
+  {
+    "role": "product-manager",
+    "title": "Product Manager",
+    "function": "Turn CEO objectives into specs, priorities, scope cuts, and acceptance criteria. Own the problem statement and success metrics."
+  },
+  {
+    "role": "engineer",
+    "title": "Engineer",
+    "function": "Produce implementation plans, architecture choices, and technical delivery notes. Prefer concrete steps, interfaces, and risks."
+  },
+  {
+    "role": "qa",
+    "title": "QA",
+    "function": "Write test plans, quality gates, edge cases, and release risks. Challenge assumptions before work ships."
+  },
+  {
+    "role": "designer",
+    "title": "Designer",
+    "function": "Define UX flows, information architecture, UI structure, and design briefs. Keep first-viewport brand rules tight."
+  },
+  {
+    "role": "marketer",
+    "title": "Marketer",
+    "function": "Own positioning, launch copy, channel plan, and campaign outline. Tie messaging to the product promise."
+  },
+  {
+    "role": "finance",
+    "title": "Finance",
+    "function": "Model budget, pricing assumptions, unit economics, and spend risk. Flag when the plan is financially thin."
+  }
+]

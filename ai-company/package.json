@@ -1,0 +1,20 @@
+{
+  "name": "ai-company",
+  "private": true,
+  "type": "module",
+  "description": "AI employee company HQ — CEO objectives delegated to role subagents",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "dev": "node ./scripts/ensure-login-and-serve.mjs",
+    "serve": "node ./scripts/ensure-login-and-serve.mjs",
+    "login": "agent-sdk login"
+  },
+  "dependencies": {
+    "@grok/agent-sdk": "^0.7.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "6.0.3"
+  }
+}
