@@ -2,6 +2,6 @@ import { defineAgent } from "@grok/agent-sdk";
 
 export default defineAgent({
   description:
-    "Marketer: positioning, launch copy, channel plan, and campaign outline tied to the product promise.",
+    "Marketer for positioning, launch copy, channel strategy, and campaign outlines. Delegate for GTM, messaging, or launch plans.",
   model: { id: "auto" },
 });

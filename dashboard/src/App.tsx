@@ -111,19 +111,13 @@ export default function App() {
             <p className="login-title">Login required</p>
             <ol className="login-steps">
               <li>
-                In a terminal: <code>cd ai-company</code>
+                In the parent folder: <code>npm run login</code> (if needed)
               </li>
               <li>
-                Run <code>npm run serve</code> — it opens browser login first,
-                then starts HQ
+                Then <code>npm run serve</code> — starts HQ + this console
               </li>
               <li>
-                Or run <code>npm run login</code>, then{" "}
-                <code>npm run serve</code>
-              </li>
-              <li>
-                Open the playground only after login succeeds:{" "}
-                <code>http://127.0.0.1:3000/playground</code>
+                Playground: <code>http://127.0.0.1:3000/playground</code>
               </li>
             </ol>
             <div className="cta-row">
