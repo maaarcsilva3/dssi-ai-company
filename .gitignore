@@ -1,0 +1,9 @@
+node_modules/
+.agent-serve/
+.cursor/
+.env
+.env.local
+memory/
+dist/
+.astro/
+*.local

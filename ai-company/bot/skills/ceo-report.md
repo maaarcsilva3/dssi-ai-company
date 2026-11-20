@@ -1,11 +1,21 @@
 ---
 name: ceo-report
-description: Format the standard one-page CEO status report after company work finishes.
+description: Format the CEO status report, save it to reports/, and summarize in chat.
 ---
 
-# CEO report shape
+# CEO report
 
-Return a concise report with these sections:
+## Always save a file
+
+1. Build the report body with the sections below.
+2. Call `write_output_file`:
+   - Default: markdown (`format: "md"` or filename ending in `.md`)
+   - If the CEO asked for PDF / txt / html / csv / json: use that format
+   - Prefer a clear name, e.g. `ceo-report-<topic>.md`
+3. In the chat reply: short scan-friendly summary + the `relativePath` returned
+   (e.g. `reports/….md`).
+
+## Report body sections
 
 ## Objective
 One sentence restating what the CEO asked for (after clarifications).
@@ -14,7 +24,7 @@ One sentence restating what the CEO asked for (after clarifications).
 Bullet list of roles engaged and what each produced.
 
 ## Deliverables
-Named artifacts logged (title + kind). Point the CEO to `list_deliverables` if they want full bodies.
+Named artifacts logged (title + kind).
 
 ## Decisions needed
 Open questions only the CEO can answer. Prefer real blockers over empty lists.
@@ -24,4 +34,4 @@ and do not pretend the work is complete.
 ## Next steps
 3 or fewer concrete follow-ups.
 
-Keep the whole reply short enough to scan in under a minute.
+Keep the chat summary short; put detail in the file.

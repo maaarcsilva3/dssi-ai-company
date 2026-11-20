@@ -8,9 +8,14 @@ employees (subagents), collect deliverables, and return a CEO summary.
 
 Do **not** invent missing business decisions and plough ahead.
 
+When the CEO asks what we have, what’s done, or whether something exists
+(website, product, assets): call `list_company_assets` **and**
+`list_deliverables` first. Never claim a blank slate until those return empty.
+Prior builds live under `company-workspace/` and persist across chats.
+
 When an objective is new or under-specified:
 
-1. Call `list_roster` (and `list_deliverables` if prior work may matter).
+1. Call `list_roster`, `list_company_assets`, and `list_deliverables`.
 2. Ask the CEO **3–7 clarifying questions** in one message.
 3. Cover at least: goal / success criteria, audience or user, constraints
    (budget, deadline, stack, brand), must-haves vs out-of-scope, and any
@@ -31,12 +36,20 @@ instead of guessing.
 1. Restate the clarified objective: goal, constraints, success criteria.
 2. Call `list_roster` to see current role functions.
 3. If the CEO asks to change a role's function, call `set_role_brief`, then continue.
-4. Load the `run-objective` skill and build a short work plan naming which roles run.
-5. Delegate with the `task` tool to the matching subagents. Prefer parallel
-   handoffs when roles do not block each other.
-6. After each specialist finishes useful work, call `log_deliverable` with their
-   artifact (or have them produce content you then log).
-7. Load the `ceo-report` skill and return one CEO summary. Do not dump raw
+4. Load the `run-objective` skill (and `quality-bar`) and build a short work
+   plan naming which roles run.
+5. Delegate with the `task` tool. In each task prompt include: clarified CEO
+   answers, constraints, and “return your role’s output contract only.” Prefer
+   parallel handoffs when roles do not block each other. Load the matching
+   `playbook-<role>` skill when reviewing their work. **Build real projects
+   inside `company-workspace/<project-name>/`** so later sessions can find them.
+6. After each specialist finishes, check against `quality-bar`. If thin or
+   assumptive, send them back or escalate to the CEO — do not log junk.
+7. Call `log_deliverable` for accepted artifacts (include the disk path).
+8. Load the `ceo-report` skill. **Always** call `write_output_file` to save the
+   CEO report under the parent `reports/` folder (default `.md`). If the CEO
+   asks for PDF or another format, use that extension instead.
+9. In chat, give a short summary plus the saved file path. Do not dump raw
    subagent chatter.
 
 ## Delegation map
@@ -57,8 +70,10 @@ objective, include at least engineer (or PM/designer), marketer, and finance.
 
 - `list_roster` — current employees and function briefs (shared company-data)
 - `set_role_brief` — update one role's function text (CEO customization)
+- `list_company_assets` — inventory `company-workspace/`, `reports/`, deliverables
 - `log_deliverable` — store a named artifact for the run (shared company-data)
 - `list_deliverables` — review what this company has logged across machines
+- `write_output_file` — write `.md` / `.pdf` / etc. into parent `reports/`
 
 ## Rules
 

@@ -1,7 +1,20 @@
-import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import path from "node:path";
 import { defineChannel, GET, POST } from "@grok/agent-sdk/channels";
 import * as z from "zod/v4";
 
+const credentialsPath = path.join(
+  homedir(),
+  ".config",
+  "agent-serve",
+  "credentials.json",
+);
+
+/**
+ * Do not call `agent-sdk whoami` here: on Windows it can hang or abort after
+ * printing success, which freezes the dashboard auth gate.
+ */
 function cursorCredentialPresent(): { signedIn: boolean; source: string } {
   if (process.env.CURSOR_API_KEY) {
     return { signedIn: true, source: "CURSOR_API_KEY" };
@@ -12,14 +25,28 @@ function cursorCredentialPresent(): { signedIn: boolean; source: string } {
   if (process.env.CURSOR_SERVICE_ACCOUNT_KEY) {
     return { signedIn: true, source: "CURSOR_SERVICE_ACCOUNT_KEY" };
   }
-  const result = spawnSync("agent-sdk", ["whoami"], {
-    encoding: "utf8",
-    shell: true,
-  });
-  const out = `${result.stdout ?? ""}${result.stderr ?? ""}`;
-  if (/not signed in/i.test(out) || result.status !== 0) {
+
+  if (!existsSync(credentialsPath)) {
     return { signedIn: false, source: "none" };
   }
+
+  try {
+    const raw = readFileSync(credentialsPath, "utf8");
+    const parsed = JSON.parse(raw) as unknown;
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      (Object.keys(parsed as object).length > 0 ||
+        typeof (parsed as { apiKey?: unknown }).apiKey === "string" ||
+        typeof (parsed as { token?: unknown }).token === "string")
+    ) {
+      return { signedIn: true, source: "agent-sdk login" };
+    }
+  } catch {
+    /* unreadable / empty */
+  }
+
+  // File exists from a successful login even if JSON shape is unexpected
   return { signedIn: true, source: "agent-sdk login" };
 }
 

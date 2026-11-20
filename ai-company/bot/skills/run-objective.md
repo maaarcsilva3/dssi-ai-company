@@ -21,15 +21,16 @@ or said to decide/execute without asking.
 1. Extract: goal, constraints, budget/deadline, success criteria, named roles.
 2. Call `list_roster` and note relevant function briefs.
 3. Write a short plan (3–7 bullets) mapping work to roles.
-4. Delegate with `task`:
+4. Delegate with `task` (include CEO answers + “use your output contract”):
    - Product ambiguity → `product-manager` first
    - Build / architecture → `engineer`
    - UX / landing / UI structure → `designer`
    - Quality / release risk → `qa`
    - Launch / messaging → `marketer`
    - Budget / pricing → `finance`
-5. After each useful specialist result, `log_deliverable`.
-6. Finish with the `ceo-report` skill.
+5. Review with `quality-bar` / matching `playbook-*`. Reject thin work.
+6. `log_deliverable` only for accepted artifacts.
+7. Finish with the `ceo-report` skill and `write_output_file` into `reports/`.
 
 ## Defaults
 

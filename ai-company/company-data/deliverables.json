@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "del_dssi_site_v1",
+    "role": "engineer",
+    "title": "DSSI marketing website (Astro)",
+    "kind": "product-build",
+    "body": "Marketing site for DSSI lives in company-workspace/marketing-website. Built in an earlier session; rebranded to DSSI; content rewritten for all-industry positioning. GitHub: https://github.com/maaarcsilva3/dssi-marketing-website. Local preview: cd company-workspace/marketing-website && npm install && npx astro dev --host 127.0.0.1 --port 4321. Launch caveat: placeholder email hello@dssi.example until real contact/Cal.com is set.",
+    "createdAt": "2026-11-20T03:20:54.000Z",
+    "sessionId": "ses_fd7fdfaccd612db4822df2c8",
+    "machine": "DESKTOP-1J3PTJN"
+  }
+]

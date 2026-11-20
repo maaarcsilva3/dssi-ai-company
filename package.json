@@ -1,0 +1,12 @@
+{
+  "name": "test-company",
+  "private": true,
+  "type": "module",
+  "description": "AI employee company — HQ playground + reports/",
+  "scripts": {
+    "serve": "node ./scripts/serve-all.mjs",
+    "dev": "node ./scripts/serve-all.mjs",
+    "login": "npm run login --prefix ./ai-company",
+    "install:all": "npm install --prefix ./ai-company"
+  }
+}

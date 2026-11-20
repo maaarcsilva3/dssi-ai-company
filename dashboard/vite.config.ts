@@ -11,6 +11,18 @@ export default defineConfig({
         changeOrigin: true,
         // agent-sdk serve --mode single mounts routes at /v1/... (no slug prefix)
         rewrite: (path) => path.replace(/^\/api/, ""),
+        // HQ CSRF guard compares Origin host to the serve host. Browser Origin
+        // is :5173 while the proxied target is :3000 → forbidden_origin.
+        // Strip browser Origin so the proxy looks like a local non-browser client.
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq) => {
+            proxyReq.removeHeader("origin");
+            proxyReq.removeHeader("referer");
+            proxyReq.removeHeader("sec-fetch-site");
+            proxyReq.removeHeader("sec-fetch-mode");
+            proxyReq.removeHeader("sec-fetch-dest");
+          });
+        },
       },
     },
   },
