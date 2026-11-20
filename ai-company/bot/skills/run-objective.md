@@ -28,6 +28,7 @@ or said to decide/execute without asking.
    - Quality / release risk → `qa`
    - Launch / messaging → `marketer`
    - Budget / pricing → `finance`
+   - Organizational memory / decisions log / cross-role context / KB curation → `chief-of-staff`
 5. Review with `quality-bar` / matching `playbook-*`. Reject thin work.
 6. `log_deliverable` only for accepted artifacts.
 7. Finish with the `ceo-report` skill and `write_output_file` into `reports/`.

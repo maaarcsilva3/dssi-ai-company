@@ -1,0 +1,16 @@
+{
+  "at": "2026-11-20T13:48:39.016Z",
+  "sessionId": "ses_869ab70334550665a5c72713",
+  "channelId": "http",
+  "status": "completed",
+  "sdkAgentId": "ses_869ab70334550665a5c72713",
+  "userMessage": "who are my team?",
+  "result": "Your team (AI Company HQ roster):\n\n| Role | Function |\n| --- | --- |\n| **Product Manager** | Specs, priorities, scope cuts, acceptance criteria, success metrics |\n| **Engineer** | Implementation plans, architecture, technical delivery |\n| **QA** | Test plans, quality gates, edge cases, release risk |\n| **Designer** | UX flows, IA, UI structure, design briefs |\n| **Marketer** | Positioning, launch copy, channels, campaigns |\n| **Finance** | Budget, pricing, unit economics, spend risk |\n\nWant to change anyone’s brief or put a role on a specific objective?",
+  "usage": {
+    "inputTokens": 30346,
+    "outputTokens": 256,
+    "cacheReadTokens": 22656,
+    "cacheWriteTokens": 0,
+    "reasoningTokens": 69
+  }
+}

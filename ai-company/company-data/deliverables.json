@@ -8,5 +8,65 @@
     "createdAt": "2026-11-20T03:20:54.000Z",
     "sessionId": "ses_fd7fdfaccd612db4822df2c8",
     "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwp1xqz3_na8yso",
+    "role": "product-manager",
+    "title": "Chief of Staff product brief (platform + knowledge system)",
+    "kind": "product-brief",
+    "body": "Problem: Fragmented org context; journal is turn history not structured knowledge; no 7th CoS role.\n\nMission: Capture, organize, understand, preserve, retrieve important org context for CEO + all AI employees.\n\nRole id ASSUMPTION: chief-of-staff. Six v1 responsibilities: Conversation Recorder, Meeting Secretary, Knowledge Manager, Decision Tracker, EA follow-ups, Intelligence Analyst.\n\nTwo-layer hard rule: raw evidence (immutable) + curated knowledge (always source_ref); never replace originals with summaries.\n\nCategories: CEO Profile; Company Profile; Projects; Technical Knowledge; Decisions; Tasks & Commitments; People & Stakeholders; Lessons Learned; Ideas & Opportunities; Historical Events.\n\nMetadata: source_ref, recorded_at, project, category, verification_status, lifecycle (current|outdated|superseded). Verifiers: CEO + PM.\n\nConsumers: all AI employees by default. Auto-ingest: chats, meetings, docs, email.\n\nDelivery slices S1–S10 (MVP: S1→S6): S1 role scaffolding; S2 KB schemas under company-workspace/knowledge/; S3 chat journal→raw; S4 curated CRUD+source_ref; S5 verification queue; S6 context_pack; S7 docs; S8 tasks; S9 intelligence digest; S10 meeting/email connectors (NEEDS CEO).\n\nInterim: thin CoS already on PM; remove after CoS ships.\n\nFull brief path: company-workspace/chief-of-staff/product-brief.md\n\nOpen CEO decisions: meeting source; email provider/scope; KB location confirm; Decisions verify CEO-only vs PM; digest cadence; S10 stub OK.",
+    "createdAt": "2026-11-20T14:05:53.487Z",
+    "sessionId": "ses_869ab70334550665a5c72713",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwp20e6t_gwizmy",
+    "role": "engineer",
+    "title": "Chief of Staff S1 platform scaffolding",
+    "kind": "tech-plan",
+    "body": "S1 shipped: chief-of-staff is a RoleId and DEFAULT_ROSTER entry; subagent at ai-company/bot/subagents/chief-of-staff/; playbook-chief-of-staff; COO instructions + run-objective routing; ceo.ts uses ROLE_IDS; company-data/roster.json has 7 roles with PM interim overlay removed; KB scaffold company-workspace/knowledge/{raw,curated,index}/ + README; dashboard RoleId updated. npm run check + agent-sdk validate pass.\n\nCaveat: live MCP list_roster in this session may still show 6 until agent serve reloads new ROLE_IDS. Cursor available_subagent_types may need product/session refresh to expose chief-of-staff to Task.\n\nNext: S2 schemas/CRUD. Open CEO: KB location, Decisions verify policy, meeting/email connectors, digest cadence, S10 stub OK.",
+    "createdAt": "2026-11-20T14:07:56.885Z",
+    "sessionId": "ses_869ab70334550665a5c72713",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwp2184w_wr141o",
+    "role": "qa",
+    "title": "Chief of Staff S1 QA — conditional go",
+    "kind": "qa-plan",
+    "body": "S1 static AC1–AC4 PASS (RoleId, subagent, wiring, PM overlay removed). KB scaffold PASS. tsc + agent-sdk validate PASS. CONDITIONAL GO: blocked on restart of agent serve/MCP so list_roster returns 7 with CoS + smoke set_role_brief/log_deliverable as chief-of-staff. Forward risks S2–S10 noted (source_ref enforcement, ingest, verification, connectors).",
+    "createdAt": "2026-11-20T14:08:35.696Z",
+    "sessionId": "ses_869ab70334550665a5c72713",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwp291q3_3qxyxw",
+    "role": "engineer",
+    "title": "Chief of Staff knowledge MVP S2–S6",
+    "kind": "product-build",
+    "body": "Implemented file-based KB at company-workspace/knowledge/: schemas; journal→raw/chats ingest (idempotent); curated CRUD with source_ref enforcement; verification queue (Decisions→verified_ceo for current); retrieve/context_pack; meetings+email disconnected drop dirs; digest stub (per-objective + weekly Friday UTC ASSUMPTION). CLI: node ai-company/scripts/knowledge/kb.mjs (npm run knowledge:smoke). Smoke ok. CoS instructions/playbook updated.",
+    "createdAt": "2026-11-20T14:14:40.635Z",
+    "sessionId": "ses_869ab70334550665a5c72713",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwp29pd2_uppzo8",
+    "role": "engineer",
+    "title": "Chief of Staff knowledge MVP S2–S6",
+    "kind": "product-build",
+    "body": "Implemented file-based KB at company-workspace/knowledge/: schemas; journal→raw/chats ingest (idempotent); curated CRUD with source_ref enforcement; verification queue (Decisions→verified_ceo for current); retrieve/context_pack; meetings+email disconnected drop dirs; digest stub (per-objective + weekly Friday UTC ASSUMPTION). CLI: node ai-company/scripts/knowledge/kb.mjs (npm run knowledge:smoke). Smoke ok. CoS instructions/playbook updated.",
+    "createdAt": "2026-11-20T14:15:11.270Z",
+    "sessionId": "ses_869ab70334550665a5c72713",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwp2aidh_mdbyhx",
+    "role": "qa",
+    "title": "Chief of Staff S2–S6 QA — conditional go",
+    "kind": "qa-plan",
+    "body": "S2–S6 CLI/KB CONDITIONAL GO. G1–G7 green: smoke, idempotent ingest, source_ref negatives, PM blocked on Decisions verify, connectors disconnected stubs, context-pack+digest. G8 RED: live list_roster still 6 until serve restart. Risks: smoke recreates sample Decision; no AJV; S7–S10 unfinished.",
+    "createdAt": "2026-11-20T14:15:48.869Z",
+    "sessionId": "ses_869ab70334550665a5c72713",
+    "machine": "Marcs-MacBook-Air.local"
   }
 ]

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-11-20T14:15:18.725Z",
+  "policy": {
+    "decisions_current_requires": "verified_ceo",
+    "note": "Decisions category must reach verified_ceo before lifecycle may be current (CEO locked 2026-11-20)."
+  },
+  "items": [
+    {
+      "id": "curated_decision_cos_seventh_role_smoke",
+      "title": "Chief of Staff as 7th platform role",
+      "category": "Decisions",
+      "project": "chief-of-staff",
+      "lifecycle_status": "outdated",
+      "recorded_at": "2026-11-20T14:08:48.262Z",
+      "suggested_verifier": "CEO",
+      "source_ref": [
+        "raw/chats/raw_chat_4c3cb3276d75aa13.meta.json"
+      ]
+    }
+  ]
+}

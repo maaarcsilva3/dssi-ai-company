@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-11-20T14:00:00.000Z",
+  "connectors": {
+    "chat_journal": {
+      "status": "connected",
+      "source": "company-workspace/memory/journal.jsonl",
+      "ingest_tool": "node ai-company/scripts/knowledge/kb.mjs ingest-journal"
+    },
+    "meetings": {
+      "status": "disconnected",
+      "drop_dir": "company-workspace/knowledge/raw/meetings/",
+      "note": "Manual upload until CEO selects meeting source (Zoom/etc)."
+    },
+    "email": {
+      "status": "disconnected",
+      "drop_dir": "company-workspace/knowledge/raw/email/",
+      "note": "CEO to provide mailbox scope and provider later."
+    },
+    "docs": {
+      "status": "manual",
+      "drop_dir": "company-workspace/knowledge/raw/docs/",
+      "note": "S7 auto-ingest; manual drop until then."
+    }
+  }
+}

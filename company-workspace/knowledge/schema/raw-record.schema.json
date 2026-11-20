@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "company-knowledge/raw-record",
+  "title": "Raw evidence record (metadata sidecar)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "kind",
+    "recorded_at",
+    "project",
+    "source_ref",
+    "content_path",
+    "ingested_at"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "kind": { "enum": ["chat", "meeting", "doc", "email"] },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "project": { "type": ["string", "null"] },
+    "source_ref": { "type": "string", "minLength": 1, "description": "Upstream pointer (e.g. journal.jsonl line)" },
+    "content_path": { "type": "string", "minLength": 1, "description": "Repo-relative path from company-workspace/knowledge/" },
+    "ingested_at": { "type": "string", "format": "date-time" },
+    "category": {
+      "type": ["string", "null"],
+      "description": "Optional hint; authority lives in curated layer"
+    },
+    "verification_status": {
+      "enum": ["n/a"],
+      "description": "Raw evidence is not verified; use curated layer"
+    },
+    "lifecycle_status": {
+      "enum": ["current"],
+      "description": "Raw blobs are immutable and always current as evidence"
+    }
+  }
+}

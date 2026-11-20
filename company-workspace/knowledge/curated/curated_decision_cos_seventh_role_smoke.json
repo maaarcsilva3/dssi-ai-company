@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "curated_decision_cos_seventh_role_smoke",
+  "title": "Chief of Staff as 7th platform role",
+  "body": "CEO chose option (d): add Chief of Staff as a real seventh AI employee with six v1 responsibilities (journal 2026-11-20).",
+  "source_ref": [
+    "raw/chats/raw_chat_4c3cb3276d75aa13.meta.json"
+  ],
+  "recorded_at": "2026-11-20T14:08:48.262Z",
+  "project": "chief-of-staff",
+  "category": "Decisions",
+  "verification_status": "unverified",
+  "lifecycle_status": "outdated",
+  "superseded_by": null,
+  "supersedes": null,
+  "audit": [
+    {
+      "at": "2026-11-20T14:15:18.723Z",
+      "actor": "chief-of-staff",
+      "action": "created",
+      "note": "Created via knowledge curated CRUD"
+    }
+  ],
+  "created_at": "2026-11-20T14:15:18.723Z",
+  "updated_at": "2026-11-20T14:15:18.723Z"
+}
