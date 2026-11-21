@@ -1,0 +1,1 @@
+export { default } from "@/app/legal/matters/[id]/page";

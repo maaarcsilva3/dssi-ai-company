@@ -68,5 +68,135 @@
     "createdAt": "2026-11-20T14:15:48.869Z",
     "sessionId": "ses_869ab70334550665a5c72713",
     "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwpzv7ri_fnadb8",
+    "role": "product-manager",
+    "title": "GBPI Legal — pilot MVP product brief (A+B+light AI)",
+    "kind": "product-brief",
+    "body": "Thin combo A (intake/status/assignment pool) + B (repository/expiry alerts) + assistive AI for 4–8 week pilot. Commercial: DSSI Operational Gap Audit → fixed pilot package. Path: company-workspace/gardenia-legal-pilot/product-brief.md. Case management explicitly out of scope.",
+    "createdAt": "2026-11-21T05:55:42.222Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwpzwdyk_wbqqqf",
+    "role": "product-manager",
+    "title": "Gardenia Legal Contract Ops Pilot — product brief",
+    "kind": "product-brief",
+    "body": "Problem: Legal contract work fragmented across Excel/GDocs/email/printed routing — hard to answer status, ownership, latest copy, expiry.\n\nUsers: senior paralegal (champion), legal staff, dept requesters; secondary Legal Managers + Execom.\n\nSuccess: champion wants pilot; Legal Manager intro; Execom path. Leading: ≥3 real intakes, ≥70% self-serve status, written proceed, manager ≥4/5. Lagging: ≥30% faster status answer; 100% dated records get pre-expiry alert; ≤2min historical lookup.\n\nScope (4–8w thin A+B+light AI): intake/status/assignment pool/custody; canonical matter + ACL + expiry 90/30/7 + CSV import; light AI summaries/flags/search assist/routing PDF prefill; print-first wet-ink; digital routing feature-flag OFF by default.\n\nOut: case management; mandatory end of wet-ink; full CLM; rankings in pilot.\n\nCommercial ASSUMPTION: DSSI Operational Gap Audit → fixed pilot package.\n\nPath: company-workspace/gardenia-legal-pilot/product-brief.md\n\nOpen CEO: pilot entities/depts; PDF full-text AI; hosting; SSO; bootstrap Excel tab; digital routing live vs staging.",
+    "createdAt": "2026-11-21T05:56:36.908Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwpzybo8_ecruoh",
+    "role": "designer",
+    "title": "GBPI Legal Contract Ops Pilot — UX/IA Design Brief",
+    "kind": "design-brief",
+    "body": "Full design brief saved to company-workspace/gardenia-legal-pilot/design-brief.md. Covers flows, IA, key screens, first viewport, visual direction + CSS tokens, states, motion, accessibility, CEO decisions, eng/marketer/QA handoffs.",
+    "createdAt": "2026-11-21T05:58:07.256Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwpzz0co_7yqegw",
+    "role": "marketer",
+    "title": "Gardenia Legal — positioning & proposal copy",
+    "kind": "gtm",
+    "body": "Saved full pitch materials to company-workspace/gardenia-legal-pilot/proposal-copy.md (GTM brief, differentiation vs Excel vs CLM, copy blocks, FAQ, channels, 2-week pursuit, claims matrix) and proposal-one-pager.md for senior paralegal → Legal Managers → Execom ladder. Frame: DSSI Operational Gap Audit + fixed pilot; promise: one system of record for status, custody, latest pointer, expiry with light AI; preserves GDocs + wet-ink.",
+    "createdAt": "2026-11-21T05:58:39.240Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwpzzecd_esw4ma",
+    "role": "engineer",
+    "title": "Gardenia Legal Contract Ops — tech plan",
+    "kind": "tech-plan",
+    "body": "Greenfield Next.js 15 + Postgres + Auth.js + Blob + Resend + React-PDF + light AI SDK (ASSUMPTION). Week 1 vertical slice: schema, auth, intake, pool, status machine, audit. Weeks 2-8: requester visibility, ACL, expiry, LEG-FORM-5 PDF print gate, import, AI assist, UAT. digitalRoutingSlipEnabled default OFF. Path: company-workspace/gardenia-legal-pilot/tech-plan.md",
+    "createdAt": "2026-11-21T05:58:57.373Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwpzzfk2_btpzc0",
+    "role": "designer",
+    "title": "Gardenia Legal Contract Ops — design brief",
+    "kind": "design-brief",
+    "body": "Calm enterprise legal UX: pool claim, matter custody, LEG-FORM-5 print gate, requester timeline, manager expiry watch, AI disclaimers. Desktop-first. Path: company-workspace/gardenia-legal-pilot/design-brief.md",
+    "createdAt": "2026-11-21T05:58:58.946Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwpzzga3_fr192b",
+    "role": "marketer",
+    "title": "Gardenia Legal proposal copy + one-pager",
+    "kind": "gtm",
+    "body": "Positioning: Operational Gap Audit + fixed pilot; system of record for status/custody/expiry with light AI; keep GDocs + wet-ink. Paths: company-workspace/gardenia-legal-pilot/proposal-copy.md and proposal-one-pager.md",
+    "createdAt": "2026-11-21T05:58:59.883Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwpzzh3e_ojpeqn",
+    "role": "finance",
+    "title": "Gardenia Legal pilot pricing",
+    "kind": "finance",
+    "body": "Recommend fixed pilot fee PHP 1,550,000 (~USD 26.7k @58). Floor PHP 1.25M. Split: Audit 350k + Build 950k + Hypercare/readout 250k. Payment 40/40/20. Path: company-workspace/gardenia-legal-pilot/finance-pilot-pricing.md",
+    "createdAt": "2026-11-21T05:59:00.938Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwq00ve2_slmcp3",
+    "role": "qa",
+    "title": "Gardenia Legal proposal readiness — conditional GO",
+    "kind": "qa-plan",
+    "body": "Conditional GO to send proposal after editorial fixes (week-2 demo wording, AC-A4 copy). Conditional GO for DSSI preview week-1 build; no-go GBPI prod data without SOW+IT. Path: company-workspace/gardenia-legal-pilot/qa-proposal-readiness.md. Editorial fixes applied to one-pager, proposal-copy, product AC-A4; CLIENT-PROPOSAL.md assembled with PHP 1.55M.",
+    "createdAt": "2026-11-21T06:00:06.122Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwq00w6g_904vn5",
+    "role": "coo",
+    "title": "Gardenia Legal CLIENT-PROPOSAL package",
+    "kind": "proposal",
+    "body": "Client-ready proposal: gap audit + fixed pilot (A+B+light AI), wet-ink first, PHP 1.550M fixed package. Path: company-workspace/gardenia-legal-pilot/CLIENT-PROPOSAL.md. Supporting: product-brief, tech-plan, design-brief, proposal-one-pager, finance-pilot-pricing.",
+    "createdAt": "2026-11-21T06:00:07.144Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwq0hrru_7divjp",
+    "role": "qa",
+    "title": "Gardenia Legal MVP — Live Demo Readiness",
+    "kind": "qa-report",
+    "body": "CONDITIONAL GO for senior paralegal live demo. Build passes; print gate + status machine + seed verified. Blocker: corrupt .next caused HTTP 500 on :3000 until restart. Full report: company-workspace/gardenia-legal-pilot/qa-mvp-demo-readiness.md",
+    "createdAt": "2026-11-21T06:13:14.586Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwq0y0f3_vqj2m8",
+    "role": "engineer",
+    "title": "Gardenia Legal Contract Ops MVP web app",
+    "kind": "product-build",
+    "body": "Runnable Next.js MVP at company-workspace/gardenia-legal-pilot/app. Demo auth (cookie role switcher), SQLite, intake→pool→claim→matter→LEG-FORM-5 print view→print gate→manager expiry→AI summary stubs. Seed users: requester@gbpi.demo, atty.jp@gbpi.demo, assigner@gbpi.demo, manager@gbpi.demo. Run: npm install && npm run db:setup && npm run db:seed && npm run dev. CEO serving at http://127.0.0.1:3000 — do not kill that process. README: company-workspace/gardenia-legal-pilot/app/README.md",
+    "createdAt": "2026-11-21T06:25:52.287Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwq0y1o1_vgxg1c",
+    "role": "qa",
+    "title": "Gardenia MVP live demo — conditional GO",
+    "kind": "qa-plan",
+    "body": "Conditional GO for live demo if server healthy. Print gate and ACL verified. Gaps vs full AC: attachments/SMTP, CSV import, expiry email digests, NL search, clause highlight, HTML print not PDF. Path: company-workspace/gardenia-legal-pilot/qa-mvp-demo-readiness.md. Note: CEO hosts http://127.0.0.1:3000 — do not stop that server.",
+    "createdAt": "2026-11-21T06:25:53.905Z",
+    "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
+    "machine": "Marcs-MacBook-Air.local"
   }
 ]
