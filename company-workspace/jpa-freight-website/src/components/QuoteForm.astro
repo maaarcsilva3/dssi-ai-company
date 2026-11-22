@@ -1,0 +1,286 @@
+---
+import { site } from '../lib/site';
+
+const endpoint = site.formEndpoint;
+---
+
+<div
+  id="quote"
+  class="scroll-mt-28 rounded-sm border border-border bg-surface-elevated p-6 shadow-sm md:p-8"
+>
+  <h2 class="font-display text-2xl font-bold text-ink">Send your inquiry</h2>
+  <p class="mt-2 text-sm text-ink-muted">
+    Ops answers 24/7; sales office {site.hoursOffice}.
+  </p>
+
+  <div id="form-success" class="mt-6 hidden rounded-sm border border-signal-line/50 bg-hero-deep p-6 text-white" role="status" data-mode="">
+    <svg class="h-10 w-10 text-signal-line" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+      <path d="M8 12l3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+    <h3 id="form-success-title" class="mt-4 font-display text-xl font-bold">Request received</h3>
+    <p id="form-success-body" class="mt-2 text-sm text-white/80">
+      Thanks—we received your request. Our sales team will contact you during office hours ({site.hoursOffice}).
+      For urgent moves, call {site.phone} (operations {site.hoursOps}).
+    </p>
+    <p class="mt-4 text-sm">
+      <a href={site.phoneTel} class="font-semibold text-signal-line hover:underline">Call sales</a>
+      {' · '}
+      <a href={`mailto:${site.emailSales}`} class="font-semibold text-signal-line hover:underline">
+        {site.emailSales}
+      </a>
+    </p>
+  </div>
+
+  <form id="quote-form" class="mt-6 space-y-5" novalidate>
+    <div id="form-error-banner" class="hidden rounded-sm border border-error bg-red-50 px-4 py-3 text-sm text-error" role="alert"></div>
+
+    <div id="form-fields" class="space-y-5">
+      <p id="form-errors-summary" class="sr-only" role="alert"></p>
+
+      <div>
+        <label for="inquiry-type" class="block text-sm font-medium text-ink">Inquiry type *</label>
+        <select
+          id="inquiry-type"
+          name="inquiryType"
+          required
+          class="field-input mt-1 w-full rounded-sm border border-border px-3 py-2.5 text-sm text-ink"
+        >
+          <option value="">Select…</option>
+          <option value="Quote">Quote</option>
+          <option value="General">General</option>
+          <option value="Careers">Careers</option>
+        </select>
+        <p id="err-inquiry-type" class="mt-1 hidden text-sm text-error" role="alert"></p>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-2">
+        <div>
+          <label for="name" class="block text-sm font-medium text-ink">Full name *</label>
+          <p class="text-xs text-ink-muted">Your name as we should address you.</p>
+          <input id="name" name="name" type="text" required autocomplete="name" class="field-input mt-1 w-full rounded-sm border border-border px-3 py-2.5 text-sm text-ink" />
+          <p id="err-name" class="mt-1 hidden text-sm text-error" role="alert"></p>
+        </div>
+        <div>
+          <label for="company" class="block text-sm font-medium text-ink">Company name</label>
+          <p class="text-xs text-ink-muted">Optional for individual shippers.</p>
+          <input id="company" name="company" type="text" autocomplete="organization" class="field-input mt-1 w-full rounded-sm border border-border px-3 py-2.5 text-sm text-ink" />
+        </div>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-2">
+        <div>
+          <label for="email" class="block text-sm font-medium text-ink">Email address *</label>
+          <input id="email" name="email" type="email" required autocomplete="email" class="field-input mt-1 w-full rounded-sm border border-border px-3 py-2.5 text-sm text-ink" />
+          <p id="err-email" class="mt-1 hidden text-sm text-error" role="alert"></p>
+        </div>
+        <div>
+          <label for="phone" class="block text-sm font-medium text-ink">Mobile number *</label>
+          <p class="text-xs text-ink-muted">e.g. 09XX-XXX-XXXX for faster follow-up.</p>
+          <input id="phone" name="phone" type="tel" required autocomplete="tel" class="field-input mt-1 w-full rounded-sm border border-border px-3 py-2.5 text-sm text-ink" />
+          <p id="err-phone" class="mt-1 hidden text-sm text-error" role="alert"></p>
+        </div>
+      </div>
+
+      <div>
+        <label for="service-need" class="block text-sm font-medium text-ink">What do you need?</label>
+        <select id="service-need" name="serviceNeed" class="field-input mt-1 w-full rounded-sm border border-border px-3 py-2.5 text-sm text-ink">
+          <option value="">Select…</option>
+          <option value="Hauling">Hauling</option>
+          <option value="Hire a Helper">Hire a Helper</option>
+          <option value="Other / Multiple">Other / Multiple</option>
+        </select>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-2">
+        <div>
+          <label for="origin" class="block text-sm font-medium text-ink">Pickup location</label>
+          <input id="origin" name="origin" type="text" class="field-input mt-1 w-full rounded-sm border border-border px-3 py-2.5 text-sm text-ink" />
+        </div>
+        <div>
+          <label for="destination" class="block text-sm font-medium text-ink">Delivery location</label>
+          <input id="destination" name="destination" type="text" class="field-input mt-1 w-full rounded-sm border border-border px-3 py-2.5 text-sm text-ink" />
+        </div>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-2">
+        <div>
+          <label for="cargo" class="block text-sm font-medium text-ink">Cargo description</label>
+          <input id="cargo" name="cargo" type="text" class="field-input mt-1 w-full rounded-sm border border-border px-3 py-2.5 text-sm text-ink" />
+        </div>
+        <div>
+          <label for="preferred-date" class="block text-sm font-medium text-ink">Target pickup or delivery date</label>
+          <input id="preferred-date" name="preferredDate" type="date" class="field-input mt-1 w-full rounded-sm border border-border px-3 py-2.5 text-sm text-ink" />
+        </div>
+      </div>
+
+      <div>
+        <label for="message" class="block text-sm font-medium text-ink">Additional notes *</label>
+        <textarea id="message" name="message" required rows="4" class="field-input mt-1 w-full rounded-sm border border-border px-3 py-2.5 text-sm text-ink"></textarea>
+        <p id="err-message" class="mt-1 hidden text-sm text-error" role="alert"></p>
+      </div>
+
+      <p class="text-xs text-ink-muted">
+        By submitting, you agree we may contact you about this inquiry via phone or email.
+      </p>
+
+      <button type="submit" id="submit-btn" class="btn-primary w-full md:w-auto">
+        Send request
+      </button>
+
+      {!endpoint && (
+        <p class="text-xs text-ink-muted">
+          Submitting opens your email app with a pre-filled message to {site.emailSales}. You can also call{' '}
+          <a href={site.phoneTel} class="font-medium text-ink underline-offset-2 hover:underline">{site.phone}</a>.
+        </p>
+      )}
+    </div>
+  </form>
+</div>
+
+<style>
+  .field-input[aria-invalid='true'] {
+    border-color: var(--color-error);
+  }
+</style>
+
+<script define:vars={{ endpoint, salesEmail: site.emailSales, phone: site.phone, siteHoursOffice: site.hoursOffice, siteHoursOps: site.hoursOps }}>
+  const form = document.getElementById('quote-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const successPanel = document.getElementById('form-success');
+  const fieldsWrap = document.getElementById('form-fields');
+  const errorBanner = document.getElementById('form-error-banner');
+  const summary = document.getElementById('form-errors-summary');
+
+  const rules = [
+    { id: 'inquiry-type', errId: 'err-inquiry-type', msg: 'Select an inquiry type.' },
+    { id: 'name', errId: 'err-name', msg: 'Enter your full name.' },
+    { id: 'email', errId: 'err-email', msg: 'Enter a valid email address.' },
+    { id: 'phone', errId: 'err-phone', msg: 'Enter your mobile number.' },
+    { id: 'message', errId: 'err-message', msg: 'Add a short message or cargo notes.' },
+  ];
+
+  function setFieldError(id, errId, show, text) {
+    const el = document.getElementById(id);
+    const err = document.getElementById(errId);
+    if (!(el instanceof HTMLElement) || !err) return;
+    if (show) {
+      el.setAttribute('aria-invalid', 'true');
+      err.textContent = text;
+      err.classList.remove('hidden');
+    } else {
+      el.removeAttribute('aria-invalid');
+      err.classList.add('hidden');
+    }
+  }
+
+  function validate() {
+    let firstInvalid = null;
+    const errors = [];
+    rules.forEach(({ id, errId, msg }) => {
+      const el = document.getElementById(id);
+      if (!(el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement)) return;
+      let invalid = !el.value.trim();
+      if (id === 'email' && el.value.trim() && !el.validity.valid) invalid = true;
+      setFieldError(id, errId, invalid, msg);
+      if (invalid) {
+        if (!firstInvalid) firstInvalid = el;
+        errors.push(msg);
+      }
+    });
+    if (summary) summary.textContent = errors.join(' ');
+    return { ok: !firstInvalid, firstInvalid };
+  }
+
+  function collectData(formEl) {
+    const fd = new FormData(formEl);
+    return Object.fromEntries(fd.entries());
+  }
+
+  function mailtoSubmit(data) {
+    const subject = encodeURIComponent(`[JPA] ${data.inquiryType || 'Inquiry'} — ${data.name}`);
+    const body = encodeURIComponent(
+      [
+        `Inquiry type: ${data.inquiryType}`,
+        `Name: ${data.name}`,
+        `Company: ${data.company || '—'}`,
+        `Email: ${data.email}`,
+        `Phone: ${data.phone}`,
+        `Service need: ${data.serviceNeed || '—'}`,
+        `Origin: ${data.origin || '—'}`,
+        `Destination: ${data.destination || '—'}`,
+        `Cargo: ${data.cargo || '—'}`,
+        `Preferred date: ${data.preferredDate || '—'}`,
+        '',
+        data.message,
+      ].join('\n')
+    );
+    window.location.href = `mailto:${salesEmail}?subject=${subject}&body=${body}`;
+    return 'mailto';
+  }
+
+  async function postForm(data) {
+    if (!endpoint) return mailtoSubmit(data);
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('network');
+    return 'endpoint';
+  }
+
+  function showSuccess(mode) {
+    const title = document.getElementById('form-success-title');
+    const body = document.getElementById('form-success-body');
+    if (mode === 'mailto') {
+      if (title) title.textContent = 'Finish in your email app';
+      if (body) {
+        body.textContent = `We opened a draft to ${salesEmail}. Send it to complete your request. If nothing opened, email us directly or call ${phone} (ops ${siteHoursOps}). Office hours: ${siteHoursOffice}.`;
+      }
+    } else {
+      if (title) title.textContent = 'Request received';
+      if (body) {
+        body.textContent = `Thanks—we received your request. Our sales team will contact you during office hours (${siteHoursOffice}). For urgent moves, call ${phone} (operations ${siteHoursOps}).`;
+      }
+    }
+    fieldsWrap?.classList.add('hidden');
+    form?.classList.add('hidden');
+    successPanel?.classList.remove('hidden');
+  }
+
+  // Pre-select inquiry type from URL
+  const params = new URLSearchParams(window.location.search);
+  const intent = params.get('intent');
+  if (intent === 'careers') {
+    const sel = document.getElementById('inquiry-type');
+    if (sel instanceof HTMLSelectElement) sel.value = 'Careers';
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBanner?.classList.add('hidden');
+    const result = validate();
+    if (!result.ok) {
+      result.firstInvalid?.focus();
+      return;
+    }
+    if (!(form instanceof HTMLFormElement) || !(submitBtn instanceof HTMLButtonElement)) return;
+    submitBtn.disabled = true;
+    submitBtn.setAttribute('aria-busy', 'true');
+    submitBtn.textContent = 'Sending…';
+    try {
+      const data = collectData(form);
+      const mode = await postForm(data);
+      showSuccess(mode);
+    } catch {
+      errorBanner?.classList.remove('hidden');
+      if (errorBanner) {
+        errorBanner.textContent = `Could not send. Call ${phone} or email ${salesEmail}.`;
+      }
+      submitBtn.disabled = false;
+      submitBtn.removeAttribute('aria-busy');
+      submitBtn.textContent = 'Send request';
+    }
+  });
+</script>

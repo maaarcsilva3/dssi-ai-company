@@ -1,0 +1,98 @@
+---
+import { withBase } from '../lib/site';
+
+const images = [
+  { src: withBase('/images/hero-1.jpg'), alt: 'JPA freight truck on the highway', caption: 'Highway operations' },
+  { src: withBase('/images/hero-2.png'), alt: 'JPA fleet unit', caption: 'Fleet unit' },
+  { src: withBase('/images/gallery-2.jpg'), alt: 'JPA trucks at operations base', caption: 'Operations yard' },
+  { src: withBase('/images/hero-3.png'), alt: 'JPA logistics operations', caption: 'Logistics support' },
+  { src: withBase('/images/about-banner.png'), alt: 'JPA Freight company operations', caption: 'Company operations' },
+  { src: withBase('/images/services-banner.png'), alt: 'JPA hauling services', caption: 'Hauling services' },
+];
+---
+
+<section id="fleet" class="section-y bg-surface-elevated">
+  <div class="content-max">
+    <h2 class="font-display text-3xl font-bold tracking-tight text-ink md:text-4xl">
+      Equipped for visibility and uptime
+    </h2>
+    <p class="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted md:text-lg">
+      Our units run with <strong class="font-semibold text-ink">GPS</strong> so your team and ours share
+      a clearer picture of the move. Combined with <strong class="font-semibold text-ink">24×7 on-site
+      maintenance</strong>, we aim to reduce unnecessary downtime—not add noise to your supply chain.
+    </p>
+    <p class="mt-2 text-sm text-ink-muted">
+      Fleet scale: <strong class="text-ink">100+ 10-wheeler trucks</strong> (owner-confirmed).
+    </p>
+
+    <ul
+      class="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4"
+      role="list"
+      id="fleet-gallery"
+    >
+      {
+        images.map((img, i) => (
+          <li>
+            <button
+              type="button"
+              class="fleet-thumb group relative block w-full overflow-hidden rounded-sm border border-border text-left focus:outline-none"
+              data-index={i}
+              aria-label={`View larger: ${img.caption}`}
+            >
+              <img
+                src={img.src}
+                alt={img.alt}
+                class="aspect-[4/3] h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+              <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-hero-deep/90 to-transparent px-2 py-2 text-xs font-medium text-white">
+                {img.caption}
+              </span>
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <dialog
+    id="fleet-lightbox"
+    class="max-h-[90vh] max-w-4xl rounded-sm border border-border bg-hero-deep p-0 text-white backdrop:bg-black/70 open:flex open:flex-col"
+  >
+    <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
+      <p id="lightbox-caption" class="text-sm font-medium"></p>
+      <button
+        type="button"
+        id="lightbox-close"
+        class="rounded-sm px-3 py-1 text-sm border border-white/30 hover:bg-white/10"
+      >
+        Close
+      </button>
+    </div>
+    <img id="lightbox-img" src="" alt="" class="max-h-[75vh] w-full object-contain" />
+  </dialog>
+</section>
+
+<script define:vars={{ images }}>
+  const dialog = document.getElementById('fleet-lightbox');
+  const lbImg = document.getElementById('lightbox-img');
+  const lbCaption = document.getElementById('lightbox-caption');
+  const closeBtn = document.getElementById('lightbox-close');
+
+  document.querySelectorAll('.fleet-thumb').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const i = Number(btn.dataset.index);
+      const img = images[i];
+      if (!dialog || !lbImg || !lbCaption || !img) return;
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lbCaption.textContent = img.caption;
+      dialog.showModal();
+    });
+  });
+
+  closeBtn?.addEventListener('click', () => dialog?.close());
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+</script>

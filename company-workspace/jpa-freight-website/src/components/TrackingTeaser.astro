@@ -1,0 +1,96 @@
+---
+import { site } from '../lib/site';
+---
+
+<section id="tracking" class="section-y border-y border-border bg-surface">
+  <div class="content-max">
+    <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Shipment visibility</p>
+        <h2 class="mt-2 font-display text-3xl font-bold tracking-tight text-ink md:text-4xl">
+          Customer tracking—coming soon
+        </h2>
+        <p class="mt-4 text-base leading-relaxed text-ink-muted">
+          We’re building a dedicated tracking experience on this site. <strong class="text-ink">Today</strong>,
+          for live shipment status, contact our sales team—we’ll give you accurate updates through our
+          operations and customer service channels.
+        </p>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a href={`mailto:${site.emailSales}`} class="btn-primary w-full sm:w-auto">
+            Email {site.emailSales}
+          </a>
+          <a href={site.phoneTel} class="btn-ghost-light w-full sm:w-auto">
+            Call {site.phone}
+          </a>
+        </div>
+      </div>
+
+      <div class="rounded-sm border border-border bg-surface-elevated p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-ink-muted">Preview UI (not live)</p>
+        <div class="mt-4 space-y-3 font-mono text-sm" aria-hidden="true">
+          <div class="flex justify-between border-b border-border pb-2">
+            <span class="text-ink-muted">Shipment ID</span>
+            <span class="text-ink">— — —</span>
+          </div>
+          <div class="flex justify-between border-b border-border pb-2">
+            <span class="text-ink-muted">Status</span>
+            <span class="text-signal-line font-semibold">Portal coming soon</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-ink-muted">Last update</span>
+            <span class="text-ink-muted">Contact sales for live status</span>
+          </div>
+        </div>
+
+        <form id="tracking-notify" class="mt-6 border-t border-border pt-6">
+          <label for="notify-email" class="block text-sm font-medium text-ink">
+            Notify me when tracking launches
+          </label>
+          <p class="mt-1 text-xs text-ink-muted">Stored locally on this device until a backend is connected.</p>
+          <div class="mt-3 flex gap-2">
+            <input
+              type="email"
+              id="notify-email"
+              name="email"
+              placeholder="you@company.com"
+              class="min-w-0 flex-1 rounded-sm border border-border px-3 py-2 text-sm"
+              autocomplete="email"
+            />
+            <button type="submit" class="btn-primary shrink-0 !py-2 !px-4 text-sm">
+              Save
+            </button>
+          </div>
+          <p id="notify-msg" class="mt-2 text-sm text-ink-muted" role="status" hidden></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('tracking-notify');
+  const status = document.getElementById('notify-msg');
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('notify-email');
+    if (!(input instanceof HTMLInputElement)) return;
+    const email = input.value.trim();
+    if (!email || !input.validity.valid) {
+      input.setAttribute('aria-invalid', 'true');
+      return;
+    }
+    try {
+      localStorage.setItem('jpa-tracking-notify', email);
+      if (status) {
+        status.hidden = false;
+        status.textContent = 'Saved. We’ll reach out when the portal is ready—or contact sales today.';
+      }
+    } catch {
+      if (status) {
+        status.hidden = false;
+        status.textContent = 'Could not save locally. Email sales@jpafreight.ph instead.';
+      }
+    }
+  });
+</script>

@@ -1,0 +1,12 @@
+# Serves the pre-built Astro dist/ only (no Node build in container).
+# Host nginx should proxy /dev/jpa-marketing-website/ → this service (strip prefix).
+services:
+  jpa-marketing-website:
+    image: nginx:alpine
+    container_name: jpa-marketing-website
+    ports:
+      - "8093:80"
+    volumes:
+      - ./dist:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped

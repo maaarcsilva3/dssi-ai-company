@@ -1,0 +1,150 @@
+---
+import { site, navLinks, withBase } from '../lib/site';
+
+interface Props {
+  variant?: 'hero' | 'default';
+}
+
+const { variant = 'default' } = Astro.props;
+const normalize = (p: string) => p.replace(/\/+$/, '') || '/';
+const pathname = normalize(Astro.url.pathname);
+const isHero = variant === 'hero';
+---
+
+<header
+  id="site-header"
+  class="fixed inset-x-0 top-0 z-50 transition-all duration-300"
+  data-solid={isHero ? 'false' : 'true'}
+  data-hero-mode={isHero ? 'true' : 'false'}
+>
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
+    <a href={withBase('/')} class="header-brand flex items-center gap-2.5 transition">
+      <img
+        src={withBase('/images/logo.png')}
+        alt=""
+        width="40"
+        height="40"
+        class="h-9 w-auto header-logo"
+      />
+      <span class="header-wordmark font-display text-sm font-bold tracking-wide md:text-base">
+        {site.shortName}
+      </span>
+    </a>
+
+    <nav class="hidden items-center gap-6 lg:flex" aria-label="Primary">
+      {
+        navLinks.map((link) => (
+          <a
+            href={link.href}
+            class:list={[
+              'header-link text-sm font-medium transition',
+              pathname === normalize(link.href) ? 'header-link-active' : '',
+            ]}
+          >
+            {link.label}
+          </a>
+        ))
+      }
+      <a href={site.phoneTel} class="header-phone text-sm font-medium transition hidden xl:inline">
+        {site.phone}
+      </a>
+      <a href={site.primaryCtaHref} class="btn-primary !py-2 !px-4 text-xs md:text-sm">
+        {site.primaryCta}
+      </a>
+    </nav>
+
+    <details class="relative lg:hidden">
+      <summary
+        class="header-menu-btn list-none cursor-pointer rounded-sm border px-3 py-2 text-sm font-medium"
+      >
+        Menu
+      </summary>
+      <div
+        class="absolute right-0 mt-2 w-56 rounded-sm border border-border bg-surface-elevated p-3 shadow-lg"
+      >
+        {
+          navLinks.map((link) => (
+            <a
+              href={link.href}
+              class="block rounded-sm px-3 py-2 text-sm text-ink hover:bg-surface"
+            >
+              {link.label}
+            </a>
+          ))
+        }
+        <a href={site.phoneTel} class="block px-3 py-2 text-sm text-ink-muted">
+          Call {site.phone}
+        </a>
+        <a
+          href={site.primaryCtaHref}
+          class="btn-primary mt-2 !flex w-full !py-2.5 text-center"
+        >
+          {site.primaryCta}
+        </a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<style>
+  #site-header[data-hero-mode='true']:not([data-solid='true']) .header-brand,
+  #site-header[data-hero-mode='true']:not([data-solid='true']) .header-link,
+  #site-header[data-hero-mode='true']:not([data-solid='true']) .header-phone,
+  #site-header[data-hero-mode='true']:not([data-solid='true']) .header-wordmark {
+    color: white;
+  }
+
+  #site-header[data-hero-mode='true']:not([data-solid='true']) .header-link:not(.header-link-active) {
+    color: rgb(255 255 255 / 0.72);
+  }
+
+  #site-header[data-hero-mode='true']:not([data-solid='true']) .header-link:hover {
+    color: white;
+  }
+
+  #site-header[data-hero-mode='true']:not([data-solid='true']) .header-link-active {
+    color: var(--color-signal-line);
+  }
+
+  #site-header[data-hero-mode='true']:not([data-solid='true']) .header-menu-btn {
+    border-color: rgb(255 255 255 / 0.35);
+    color: white;
+  }
+
+  #site-header[data-solid='true'] {
+    background: color-mix(in srgb, var(--color-surface-elevated) 94%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  #site-header[data-solid='true'] .header-brand,
+  #site-header[data-solid='true'] .header-wordmark,
+  #site-header[data-solid='true'] .header-link,
+  #site-header[data-solid='true'] .header-phone {
+    color: var(--color-ink);
+  }
+
+  #site-header[data-solid='true'] .header-link:not(.header-link-active) {
+    color: color-mix(in srgb, var(--color-ink) 65%, transparent);
+  }
+
+  #site-header[data-solid='true'] .header-link-active {
+    color: var(--color-accent);
+  }
+
+  #site-header[data-solid='true'] .header-menu-btn {
+    border-color: var(--color-border);
+    color: var(--color-ink);
+  }
+</style>
+
+<script>
+  const header = document.getElementById('site-header');
+  if (header && header.dataset.heroMode === 'true') {
+    const sync = () => {
+      header.dataset.solid = window.scrollY > 48 ? 'true' : 'false';
+    };
+    sync();
+    window.addEventListener('scroll', sync, { passive: true });
+  }
+</script>

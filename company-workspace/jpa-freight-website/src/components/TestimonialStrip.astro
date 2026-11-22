@@ -1,0 +1,36 @@
+---
+const quotes = [
+  {
+    text: 'Responsive sales team and clear communication on our Batangas-to-Luzon lanes.',
+    name: 'Operations Manager',
+    company: 'Sample Client',
+  },
+  {
+    text: 'Knowing there’s 24/7 support gives us confidence for after-hours pulls.',
+    name: 'Logistics Lead',
+    company: 'Sample Client',
+  },
+];
+---
+
+<section id="testimonials" class="section-y bg-hero-asphalt text-white">
+  <div class="content-max">
+    <h2 class="font-display text-3xl font-bold tracking-tight md:text-4xl">What partners say</h2>
+    <p class="mt-2 text-sm text-signal-line/90">SAMPLE quotes — replace before public launch</p>
+    <div class="mt-10 grid gap-6 md:grid-cols-2">
+      {
+        quotes.map((q) => (
+          <figure class="rounded-sm border border-white/15 bg-hero-deep/80 p-6">
+            <blockquote class="text-base leading-relaxed text-white/90">“{q.text}”</blockquote>
+            <figcaption class="mt-4 text-sm text-white/60">
+              — {q.name}, <span class="text-white/45">{q.company}</span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+    <p class="mt-6 text-xs text-white/45">
+      * Demo testimonials only. Replace with verified client quotes and permissions before launch.
+    </p>
+  </div>
+</section>

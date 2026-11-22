@@ -198,5 +198,115 @@
     "createdAt": "2026-11-21T06:25:53.905Z",
     "sessionId": "ses_ba3dfcc43bcc90e713ae13b8",
     "machine": "Marcs-MacBook-Air.local"
+  },
+  {
+    "id": "del_mwr33vq2_3vrdm9",
+    "role": "marketer",
+    "title": "JPA Freight website copy pack",
+    "kind": "gtm",
+    "body": "Production copy pack for JPA Freight Logistics static site revamp: positioning (Batangas-based nationwide hauler; 24/7 ops; GPS; honest tracking teaser), 3 key messages, paste-ready Home/Services/About/Contact blocks, FAQ, claims matrix. ASSUMPTION: testimonials, fleet size, years, certifications until CEO verifies. File: jpa-freight-website/copy-pack.md. Hero options: (A) tagline-forward \"Whatever day it is… we deliver.\" (B) \"Nationwide hauling you can coordinate—not chase.\" (C) \"Freight that runs on your schedule—and ours, 24/7.\"",
+    "createdAt": "2026-11-22T00:14:11.546Z",
+    "sessionId": "ses_7e7cdf6c096c57666a831861",
+    "machine": "Marcs-iMac-Pro.local"
+  },
+  {
+    "id": "del_mwr33z7d_gikpsm",
+    "role": "designer",
+    "title": "JPA Freight Astro revamp — design brief",
+    "kind": "design-brief",
+    "body": "Full brief at jpa-freight-website/design-brief.md. Routes: /, /services, /about, /contact. Visual: Asphalt & signal — Barlow Condensed + Outfit; tokens --color-hero-asphalt, --color-accent, --color-signal-line, --font-display, --font-sans. Home hero: brand-level logo, tagline headline, quote + track CTAs, full-bleed fleet road image. Must-haves: quote form, SVG PH coverage map, fleet gallery, tracking teaser, testimonials. Form stub ASSUMPTION (Formspree/mailto). CEO needed: brand hex, photos, testimonials, careers copy.",
+    "createdAt": "2026-11-22T00:14:16.057Z",
+    "sessionId": "ses_7e7cdf6c096c57666a831861",
+    "machine": "Marcs-iMac-Pro.local"
+  },
+  {
+    "id": "del_mwr34epv_hwlwbx",
+    "role": "designer",
+    "title": "JPA Freight website — design brief",
+    "kind": "design-brief",
+    "body": "Asphalt & signal visual direction for JPA Freight Logistics multi-page Astro site. Keep name+logo; modern industrial highway mood (charcoal/steel + hi-vis amber). Pages: / /services /about#careers /contact#quote. Must-haves placed: coverage map, fleet gallery, tracking teaser, testimonials, quote form. Fonts: Barlow Condensed + Outfit. Full brief: company-workspace/jpa-freight-website/design-brief.md. NEEDS CEO: brand hex, real testimonials, careers roles, form endpoint.",
+    "createdAt": "2026-11-22T00:14:36.163Z",
+    "sessionId": "ses_7e7cdf6c096c57666a831861",
+    "machine": "Marcs-iMac-Pro.local"
+  },
+  {
+    "id": "del_mwr34gtu_u1fu92",
+    "role": "marketer",
+    "title": "JPA Freight website — copy pack",
+    "kind": "gtm",
+    "body": "Positioning: Batangas-based nationwide hauler with 24/7 ops, GPS on all units, VAS — honest tracking teaser (coming soon / ask sales). Hero primary: Whatever day it is… we deliver. Page-ready copy for Home/Services/About/Contact + FAQ + claims matrix. SAMPLE testimonials flagged. Full pack: company-workspace/jpa-freight-website/copy-pack.md. Facts: founded 2004, 100+ 10-wheelers, Gerardo S. Alday origin story.",
+    "createdAt": "2026-11-22T00:14:38.898Z",
+    "sessionId": "ses_7e7cdf6c096c57666a831861",
+    "machine": "Marcs-iMac-Pro.local"
+  },
+  {
+    "id": "del_mwr3bzzk_uknf15",
+    "role": "engineer",
+    "title": "JPA Freight website — Astro multi-page build",
+    "kind": "product-build",
+    "body": "Static Astro 7 + Tailwind 4 site at company-workspace/jpa-freight-website/. Pages: / /services /about /contact. Features: hero+logo, coverage SVG map, fleet gallery, tracking teaser, SAMPLE testimonials, quote form (mailto/Formspree). Preview: npm run dev -- --host 127.0.0.1 --port 4322 → http://127.0.0.1:4322/. Build PASS. Docs: README.md, tech-notes.md.",
+    "createdAt": "2026-11-22T00:20:30.321Z",
+    "sessionId": "ses_7e7cdf6c096c57666a831861",
+    "machine": "Marcs-iMac-Pro.local"
+  },
+  {
+    "id": "del_mwr3c1nm_sttitd",
+    "role": "qa",
+    "title": "JPA Freight website — demo readiness",
+    "kind": "qa-plan",
+    "body": "CONDITIONAL GO for owner demo. All CEO must-haves PASS. Risks: mailto success honesty (COO patched), content claims confirm with owner, hero tracking CTA softened. Report: company-workspace/jpa-freight-website/qa-demo-readiness.md.",
+    "createdAt": "2026-11-22T00:20:32.482Z",
+    "sessionId": "ses_7e7cdf6c096c57666a831861",
+    "machine": "Marcs-iMac-Pro.local"
+  },
+  {
+    "id": "del_mwr3pimy_calhiq",
+    "role": "engineer",
+    "title": "JPA Freight — dist + docker-compose for /dev/jpa-marketing-website",
+    "kind": "tech-plan",
+    "body": "Astro base set to /dev/jpa-marketing-website; withBase() for all links/assets; npm run build → dist/. docker-compose.yml serves dist via nginx:alpine on host :8093. Container nginx.conf try_files. Host nginx snippet: location /dev/jpa-marketing-website/ → proxy_pass http://127.0.0.1:8093/; (strip prefix). Docker daemon unavailable on build machine—run compose on server after copying project + dist.",
+    "createdAt": "2026-11-22T00:31:01.018Z",
+    "sessionId": "ses_7e7cdf6c096c57666a831861",
+    "machine": "Marcs-iMac-Pro.local"
+  },
+  {
+    "id": "del_mwrywes2_x2i9do",
+    "role": "engineer",
+    "title": "Gardenia Legal — Docker Compose for /dev/gardenia-legal-pilot",
+    "kind": "tech-plan",
+    "body": "Next.js standalone Docker deploy at company-workspace/gardenia-legal-pilot/. Port 8094; basePath /dev/gardenia-legal-pilot; named volume gardenia-legal-pilot-data; first-boot seed only if DB empty. Files: docker-compose.yml, app/Dockerfile, app/docker-entrypoint.sh, README.md. Host nginx MUST proxy_pass http://127.0.0.1:8094 WITHOUT trailing slash (preserve path—unlike JPA strip). Smoke: http://127.0.0.1:8094/dev/gardenia-legal-pilot/. npm run build PASS locally; Docker daemon unavailable—run compose on server. No OPENAI_API_KEY; no CI/CD.",
+    "createdAt": "2026-11-22T15:04:10.706Z",
+    "sessionId": "ses_49bd1bff6650bf1c4dba10c0",
+    "machine": "Marcs-iMac-Pro.local"
+  },
+  {
+    "id": "del_mwrywgi6_i7px01",
+    "role": "qa",
+    "title": "Gardenia Legal — Docker deploy readiness",
+    "kind": "qa-plan",
+    "body": "CONDITIONAL GO for server deploy. AC Pass: Next Docker, 8094, volume, first-boot seed, basePath, cookie path, no API key. Blocked until ops: docker compose build/up + nginx preserve-path + public HTTPS smoke. Critical risk: copying JPA proxy_pass trailing slash breaks Next. Report: company-workspace/gardenia-legal-pilot/qa-docker-deploy-readiness.md",
+    "createdAt": "2026-11-22T15:04:12.943Z",
+    "sessionId": "ses_49bd1bff6650bf1c4dba10c0",
+    "machine": "Marcs-iMac-Pro.local"
+  },
+  {
+    "id": "del_mwrz37n8_3nl5d4",
+    "role": "engineer",
+    "title": "Gardenia Legal — standalone dist + run-only compose",
+    "kind": "tech-plan",
+    "body": "Reshaped to JPA-like copy: server needs only docker-compose.yml + Linux dist/. Build on machine with Docker: ./scripts/build-dist.sh (app/Dockerfile.dist export). Compose uses node:20-bookworm-slim, mounts ./dist:/app:ro + named SQLite volume, no build on server. Port 8094, basePath preserved in nginx. Do not ship macOS npm build (better-sqlite3). Docker daemon unavailable here—build-dist not executed in this session.",
+    "createdAt": "2026-11-22T15:09:28.052Z",
+    "sessionId": "ses_49bd1bff6650bf1c4dba10c0",
+    "machine": "Marcs-iMac-Pro.local"
+  },
+  {
+    "id": "del_mws00swq_9dxiti",
+    "role": "engineer",
+    "title": "Gardenia Legal — slim dist built (~108MB / 33MB tgz)",
+    "kind": "product-build",
+    "body": "Slim dist ready at gardenia-legal-pilot/dist/. Size: 108MB uncompressed, ~33MB as tar.gz (docker-compose.yml + dist). Contents: Next standalone + better-sqlite3 + starter.db + entrypoint. No full project node_modules/tsx. Build: ./scripts/build-dist.sh. Fonts switched to @fontsource (Docker offline). Copy: tar czf … then extract on server + docker compose up -d. Port 8094, path /dev/gardenia-legal-pilot.",
+    "createdAt": "2026-11-22T15:35:35.258Z",
+    "sessionId": "ses_49bd1bff6650bf1c4dba10c0",
+    "machine": "Marcs-iMac-Pro.local"
   }
 ]

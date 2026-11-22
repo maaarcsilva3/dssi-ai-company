@@ -23,17 +23,25 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 
 export async function setSessionUser(userId: string) {
   const cookieStore = await cookies();
+  const cookiePath =
+    process.env.COOKIE_PATH ||
+    process.env.NEXT_PUBLIC_BASE_PATH ||
+    "/dev/gardenia-legal-pilot";
   cookieStore.set(COOKIE_NAME, userId, {
     httpOnly: true,
     sameSite: "lax",
-    path: "/",
+    path: cookiePath,
     maxAge: 60 * 60 * 24 * 7,
   });
 }
 
 export async function clearSession() {
   const cookieStore = await cookies();
-  cookieStore.delete(COOKIE_NAME);
+  const cookiePath =
+    process.env.COOKIE_PATH ||
+    process.env.NEXT_PUBLIC_BASE_PATH ||
+    "/dev/gardenia-legal-pilot";
+  cookieStore.delete({ name: COOKIE_NAME, path: cookiePath });
 }
 
 export { COOKIE_NAME };

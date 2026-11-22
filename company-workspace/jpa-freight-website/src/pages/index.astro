@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import HeroHome from '../components/HeroHome.astro';
+import TrustBand from '../components/TrustBand.astro';
+import ServicePreviewList from '../components/ServicePreviewList.astro';
+import CoverageMap from '../components/CoverageMap.astro';
+import FleetGallery from '../components/FleetGallery.astro';
+import TrackingTeaser from '../components/TrackingTeaser.astro';
+import TestimonialStrip from '../components/TestimonialStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site } from '../lib/site';
+---
+
+<BaseLayout title={`${site.shortName} | ${site.tagline}`}>
+  <SiteHeader variant="hero" />
+  <main id="main-content">
+    <HeroHome />
+    <TrustBand />
+    <ServicePreviewList />
+    <CoverageMap />
+    <FleetGallery />
+    <TrackingTeaser />
+    <TestimonialStrip />
+    <CtaBand />
+  </main>
+  <SiteFooter />
+</BaseLayout>

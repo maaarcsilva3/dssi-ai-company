@@ -4,8 +4,9 @@ import * as schema from "./schema";
 import path from "path";
 import fs from "fs";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DB_PATH = process.env.DATABASE_PATH || path.join(DATA_DIR, "gardenia.db");
+const DB_PATH =
+  process.env.DATABASE_PATH || path.join(process.cwd(), "data", "gardenia.db");
+const DATA_DIR = path.dirname(DB_PATH);
 
 let _db: ReturnType<typeof drizzle<typeof schema>> | null = null;
 let _sqlite: Database.Database | null = null;

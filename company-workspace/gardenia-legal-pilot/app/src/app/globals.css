@@ -23,20 +23,20 @@
 @theme inline {
   --color-background: var(--color-bg-page);
   --color-foreground: var(--color-text-primary);
-  --font-sans: var(--font-plex-sans);
-  --font-mono: var(--font-plex-mono);
+  --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
 body {
   background: var(--color-bg-page);
   color: var(--color-text-primary);
-  font-family: var(--font-plex-sans), "Segoe UI", system-ui, sans-serif;
+  font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   font-size: 0.9375rem;
   line-height: 1.5;
 }
 
 .font-mono-matter {
-  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
 }
 

@@ -1,0 +1,167 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import PageHeader from '../components/PageHeader.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, withBase } from '../lib/site';
+
+const values = [
+  {
+    title: 'Ethical business',
+    body: 'We deal fairly with clients, partners, and our own people.',
+  },
+  {
+    title: 'Customer focus',
+    body: 'Your shipment’s schedule drives how we plan and respond.',
+  },
+  {
+    title: 'Partnership',
+    body: 'Long-term lanes work when both sides communicate openly.',
+  },
+  {
+    title: 'Continuous improvement',
+    body: 'Better routes, better response, better tools—including tracking we’re preparing for this site.',
+  },
+];
+---
+
+<BaseLayout
+  title={`About | ${site.shortName}`}
+  description={`Family-operated logistics from Batangas since ${site.founded}. ${site.fleetCount} ${site.fleetType}, nationwide hauling, GPS-equipped fleet.`}
+>
+  <SiteHeader />
+  <main id="main-content" class="pt-16">
+    <PageHeader
+      title="Built on commitment—not shortcuts"
+      intro="WHATEVER DAY IT IS… WE DELIVER."
+      image={withBase('/images/about-banner.png')}
+    />
+
+    <section id="story" class="section-y bg-surface-elevated">
+      <div class="content-max">
+        <h2 class="font-display text-3xl font-bold tracking-tight text-ink md:text-4xl">Our story</h2>
+        <div class="mt-6 max-w-prose space-y-4 text-base leading-relaxed text-ink-muted md:text-lg">
+          <p>
+            Founded in <strong class="text-ink">{site.founded}</strong> as <strong class="text-ink">{site.foundedAs}</strong> by
+            Gerardo S. Alday, JPA Freight grew from sole proprietorship into a family corporation in{' '}
+            <strong class="text-ink">{site.corpYear}</strong>. For almost two decades we have hauled freight across the Philippines with
+            a straightforward promise: <strong class="text-ink">{site.tagline}</strong>
+          </p>
+          <p>
+            JPA Freight Logistics, Inc. serves shippers across the Philippines with ethical business practices,
+            customer focus, partnership with the communities we serve, and continuous improvement in how we haul,
+            communicate, and support every load.
+          </p>
+          <p>
+            From our base in <strong class="text-ink">Tanauan City, Batangas</strong>, we coordinate nationwide hauling
+            supported by GPS-equipped units, 24/7 operations, and value-added services including customer service,
+            on-site maintenance, and Hire a Helper when the job requires it.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-y border-t border-border bg-surface">
+      <div class="content-max">
+        <h2 class="font-display text-2xl font-bold text-ink md:text-3xl">Mission & vision</h2>
+        <div class="mt-6 grid gap-8 md:grid-cols-2">
+          <blockquote class="border-l-2 border-accent pl-4">
+            <p class="text-sm font-semibold uppercase tracking-wide text-ink-muted">Mission</p>
+            <p class="mt-2 text-base leading-relaxed text-ink">
+              To provide dependable nationwide freight and hauling services backed by ethical business, responsive
+              customer service, and operational excellence—so clients can plan moves with confidence.
+            </p>
+          </blockquote>
+          <blockquote class="border-l-2 border-signal-line pl-4">
+            <p class="text-sm font-semibold uppercase tracking-wide text-ink-muted">Vision</p>
+            <p class="mt-2 text-base leading-relaxed text-ink">
+              To be a trusted logistics partner across the Philippines—known for fleet reliability, GPS-backed
+              visibility, and a team that answers when the schedule does not wait for office hours.
+            </p>
+          </blockquote>
+        </div>
+        <p class="mt-4 text-xs text-ink-muted">
+          Mission/vision phrasing aligned with live site commitments; refine with owner-approved exact wording if it differs.
+        </p>
+      </div>
+    </section>
+
+    <section class="section-y border-t border-border">
+      <div class="content-max">
+        <h2 class="font-display text-2xl font-bold text-ink">What we stand for</h2>
+        <ul class="mt-8 grid gap-6 sm:grid-cols-2" role="list">
+          {
+            values.map((v) => (
+              <li class="border-t border-border pt-4">
+                <h3 class="font-display text-lg font-bold text-ink">{v.title}</h3>
+                <p class="mt-2 text-sm text-ink-muted">{v.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section id="operations" class="section-y border-t border-border bg-hero-asphalt text-white">
+      <div class="content-max">
+        <h2 class="font-display text-3xl font-bold">Operations & headquarters</h2>
+        <p class="mt-4 max-w-prose text-white/80">{site.address}</p>
+        <dl class="mt-8 grid gap-4 sm:grid-cols-2">
+          <div>
+            <dt class="text-xs uppercase tracking-wide text-white/50">Office hours</dt>
+            <dd class="mt-1 font-semibold">{site.hoursOffice}</dd>
+          </div>
+          <div>
+            <dt class="text-xs uppercase tracking-wide text-white/50">Operations</dt>
+            <dd class="mt-1 font-semibold">{site.hoursOps}</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section id="fleet-about" class="section-y border-t border-border bg-surface-elevated">
+      <div class="content-max">
+        <h2 class="font-display text-3xl font-bold text-ink">Fleet at scale</h2>
+        <p class="mt-4 max-w-prose text-ink-muted">
+          JPA Freight owns more than <strong class="text-ink">{site.fleetCount} units</strong> of{' '}
+          <strong class="text-ink">{site.fleetType}</strong>, supported by on-site maintenance and GPS on all units.
+        </p>
+        <a href={withBase('/#fleet')} class="mt-6 inline-block text-sm font-semibold text-accent hover:underline">
+          View fleet gallery on Home →
+        </a>
+      </div>
+    </section>
+
+    <section id="careers" class="section-y border-t border-border scroll-mt-24">
+      <div class="content-max">
+        <h2 class="font-display text-3xl font-bold text-ink">Drive with a team that runs professional logistics</h2>
+        <p class="mt-4 max-w-prose text-ink-muted">
+          We’re always interested in people who take safety, reliability, and service seriously—on the road and in
+          the yard.
+        </p>
+        <p class="mt-4 max-w-prose text-ink-muted">
+          JPA Freight operates 24/7 with GPS-equipped units, on-site maintenance, and a culture grounded in ethical
+          business and customer focus. If you’re a driver, helper, mechanic, or operations professional looking for a
+          structured employer in Batangas with nationwide work, we’d like to hear from you.
+        </p>
+        <p class="mt-4 text-sm text-ink-muted">
+          Send your name, role interest, experience, and contact number to{' '}
+          <a href={`mailto:${site.emailSales}?subject=Careers`} class="font-semibold text-accent">
+            {site.emailSales}
+          </a>{' '}
+          with subject line <strong>Careers – [Role]</strong>—or call {site.phone} and ask for recruitment.
+        </p>
+        <a
+          href={withBase('/contact?intent=careers#quote')}
+          class="btn-primary mt-8 inline-flex"
+        >
+          Join our team — send inquiry
+        </a>
+      </div>
+    </section>
+
+    <CtaBand />
+  </main>
+  <SiteFooter />
+</BaseLayout>

@@ -5,14 +5,16 @@ Thin operations layer: intake → assignment pool → status timeline → routin
 ## Run (exact commands)
 
 ```bash
-cd /Users/maaarc.silva/Desktop/Company/dssi-ai-company/company-workspace/gardenia-legal-pilot/app
+cd app
 npm install
 npm run db:setup
 npm run db:seed
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000/dev/gardenia-legal-pilot/](http://localhost:3000/dev/gardenia-legal-pilot/) (app uses base path `/dev/gardenia-legal-pilot`).
+
+**Docker / public deploy:** build Linux `dist/` via [../scripts/build-dist.sh](../scripts/build-dist.sh), then copy `dist/` + [../docker-compose.yml](../docker-compose.yml) to the server — see [../README.md](../README.md).
 
 ## Demo accounts (no password — click to sign in)
 

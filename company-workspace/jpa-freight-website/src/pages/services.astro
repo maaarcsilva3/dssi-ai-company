@@ -1,0 +1,87 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import PageHeader from '../components/PageHeader.astro';
+import ServiceBlock from '../components/ServiceBlock.astro';
+import CoverageMap from '../components/CoverageMap.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, withBase } from '../lib/site';
+---
+
+<BaseLayout
+  title={`Services | ${site.shortName}`}
+  description="Nationwide hauling plus value-added support—GPS, 24×7 customer service, on-site maintenance, and Hire a Helper."
+>
+  <SiteHeader />
+  <main id="main-content" class="pt-16">
+    <PageHeader
+      title="Services that keep freight moving"
+      intro="Nationwide hauling plus value-added support—designed for shippers who need accountability, not excuses."
+      image={withBase('/images/services-banner.png')}
+    />
+
+    <ServiceBlock
+      id="hauling"
+      title="Nationwide hauling"
+      body="JPA Freight provides hauling services across all regions of the Philippines. Whether you’re moving raw materials, finished goods, or project cargo, we align pickup, transit, and delivery with your operational window—and we run 24/7 to match real-world schedules."
+      bullets={[
+        'Philippines-wide coverage',
+        'Coordination through sales and 24×7 customer service',
+        'GPS on all units for move visibility',
+      ]}
+      ctaHref={withBase('/contact#quote')}
+      ctaLabel="Get a quote for your route"
+    />
+
+    <section id="vas" class="section-y border-t border-border bg-surface scroll-mt-24">
+      <div class="content-max">
+        <h2 class="font-display text-3xl font-bold tracking-tight text-ink md:text-4xl">
+          Value-added services
+        </h2>
+        <p class="mt-4 max-w-prose text-base leading-relaxed text-ink-muted md:text-lg">
+          Beyond the wheel, we invest in uptime and communication so your team isn’t left waiting.
+        </p>
+        <dl class="mt-10 grid gap-6 md:grid-cols-3">
+          <div class="border-l-2 border-signal-line pl-4">
+            <dt class="font-display text-lg font-bold text-ink">24×7 customer service</dt>
+            <dd class="mt-2 text-sm leading-relaxed text-ink-muted">
+              Reach us around the clock for shipment questions, escalations, and coordination—not only
+              during office hours.
+            </dd>
+          </div>
+          <div class="border-l-2 border-signal-line pl-4">
+            <dt class="font-display text-lg font-bold text-ink">24×7 on-site maintenance</dt>
+            <dd class="mt-2 text-sm leading-relaxed text-ink-muted">
+              Maintenance support on site helps address equipment issues faster and supports safer, more
+              reliable runs.
+            </dd>
+          </div>
+          <div class="border-l-2 border-signal-line pl-4">
+            <dt class="font-display text-lg font-bold text-ink">GPS on all units</dt>
+            <dd class="mt-2 text-sm leading-relaxed text-ink-muted">
+              Location visibility on equipped units supports planning and status conversations with your
+              stakeholders.
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <ServiceBlock
+      id="helper"
+      title="Hire a Helper"
+      body="Some deliveries need extra hands at pickup or drop-off. Hire a Helper adds manpower support when loading, unloading, or site handling is part of the job—ask sales when scoping your quote."
+      ctaHref={withBase('/contact#quote')}
+      ctaLabel="Include helper support in my quote"
+    />
+
+    <CoverageMap id="coverage-map" showCta={true} />
+
+    <CtaBand
+      title="Tell us what you’re moving"
+      body="Cargo type, weight/volume, locations, and target schedule—sales@jpafreight.ph or 0923-803-6723."
+    />
+  </main>
+  <SiteFooter />
+</BaseLayout>

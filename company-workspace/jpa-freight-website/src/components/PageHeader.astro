@@ -1,0 +1,26 @@
+---
+interface Props {
+  title: string;
+  intro?: string;
+  image?: string;
+  imageAlt?: string;
+}
+
+const { title, intro, image, imageAlt = '' } = Astro.props;
+---
+
+<section class="relative border-b border-border bg-hero-asphalt text-white overflow-hidden">
+  {
+    image && (
+      <div class="absolute inset-0">
+        <img src={image} alt="" class="h-full w-full object-cover opacity-40" loading="lazy" />
+        <div class="absolute inset-0 bg-gradient-to-r from-hero-deep via-hero-deep/85 to-hero-deep/60" />
+      </div>
+    )
+  }
+  <div class:list={['content-max section-y relative', !image && 'hero-mist']}>
+    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-signal-line">JPA Freight</p>
+    <h1 class="mt-3 font-display text-4xl font-bold tracking-tight md:text-5xl">{title}</h1>
+    {intro && <p class="mt-4 max-w-prose text-lg leading-relaxed text-white/80">{intro}</p>}
+  </div>
+</section>

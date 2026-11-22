@@ -1,0 +1,67 @@
+---
+import { site } from '../lib/site';
+---
+
+<div class="grid gap-4 sm:grid-cols-2">
+  <div class="rounded-sm border border-border bg-surface p-5">
+    <h3 class="text-xs font-semibold uppercase tracking-wide text-ink-muted">Phone</h3>
+    <p class="mt-2">
+      <a href={site.phoneTel} class="text-lg font-semibold text-ink hover:text-accent">
+        {site.phone}
+      </a>
+    </p>
+    <p class="mt-1 text-sm text-ink-muted">
+      Landline:{' '}
+      <a href={site.phoneLandlineTel} class="hover:text-accent">
+        {site.phoneLandline}
+      </a>
+    </p>
+  </div>
+  <div class="rounded-sm border border-border bg-surface p-5">
+    <h3 class="text-xs font-semibold uppercase tracking-wide text-ink-muted">Email</h3>
+    <p class="mt-2">
+      <a href={`mailto:${site.emailSales}`} class="font-semibold text-ink hover:text-accent">
+        {site.emailSales}
+      </a>
+    </p>
+    <p class="mt-1 text-sm">
+      <a href={`mailto:${site.emailAdmin}`} class="text-ink-muted hover:text-accent">
+        {site.emailAdmin}
+      </a>
+    </p>
+  </div>
+  <div class="rounded-sm border border-border bg-surface p-5 sm:col-span-2">
+    <h3 class="text-xs font-semibold uppercase tracking-wide text-ink-muted">Address</h3>
+    <p class="mt-2 text-ink">{site.address}</p>
+    <a
+      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`}
+      class="mt-2 inline-block text-sm font-semibold text-accent hover:underline"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Open in Google Maps →
+    </a>
+  </div>
+  <div class="rounded-sm border border-border bg-surface p-5">
+    <h3 class="text-xs font-semibold uppercase tracking-wide text-ink-muted">Hours</h3>
+    <p class="mt-2 text-sm text-ink">
+      Office: <strong>{site.hoursOffice}</strong>
+    </p>
+    <p class="text-sm text-ink">
+      Operations: <strong>{site.hoursOps}</strong>
+    </p>
+  </div>
+  <div class="rounded-sm border border-border bg-surface p-5">
+    <h3 class="text-xs font-semibold uppercase tracking-wide text-ink-muted">Social</h3>
+    <p class="mt-2">
+      <a
+        href={site.facebook}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="font-semibold text-ink hover:text-accent"
+      >
+        facebook.com/jpafreight
+      </a>
+    </p>
+  </div>
+</div>

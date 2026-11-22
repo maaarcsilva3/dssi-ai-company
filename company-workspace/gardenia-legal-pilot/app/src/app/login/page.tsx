@@ -2,6 +2,8 @@ import { getDb } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { loginAction } from "./actions";
 
+export const dynamic = "force-dynamic";
+
 export default function LoginPage() {
   const allUsers = getDb().select().from(users).all();
   return (

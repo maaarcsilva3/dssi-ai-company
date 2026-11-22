@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import PageHeader from '../components/PageHeader.astro';
+import ContactCards from '../components/ContactCards.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import { site, withBase } from '../lib/site';
+---
+
+<BaseLayout
+  title={`Contact | ${site.shortName}`}
+  description="Request a freight quote or reach sales. Office Mon–Sat 8am–5pm; operations 24/7."
+>
+  <SiteHeader />
+  <main id="main-content" class="pt-16">
+    <PageHeader
+      title="Request a quote or get in touch"
+      intro={`Office hours: ${site.hoursOffice}. Operations: ${site.hoursOps}. We’ll route your inquiry to sales.`}
+      image={withBase('/images/contact-banner.png')}
+    />
+
+    <section class="section-y bg-surface">
+      <div class="content-max grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start">
+        <div>
+          <h2 class="font-display text-2xl font-bold text-ink">Reach us directly</h2>
+          <div class="mt-6">
+            <ContactCards />
+          </div>
+        </div>
+        <QuoteForm />
+      </div>
+    </section>
+
+    <section id="tracking-fallback" class="section-y border-t border-border bg-surface-elevated">
+      <div class="content-max max-w-2xl">
+        <h2 class="font-display text-2xl font-bold text-ink">Shipment tracking</h2>
+        <p class="mt-3 text-ink-muted">
+          Tracking portal coming soon—contact{' '}
+          <a href={`mailto:${site.emailSales}`} class="font-semibold text-accent">
+            {site.emailSales}
+          </a>{' '}
+          or call <a href={site.phoneTel} class="font-semibold text-accent">{site.phone}</a> for live status on
+          active loads.
+        </p>
+      </div>
+    </section>
+  </main>
+  <SiteFooter />
+</BaseLayout>

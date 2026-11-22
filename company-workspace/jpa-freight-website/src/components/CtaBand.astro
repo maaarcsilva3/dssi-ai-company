@@ -1,0 +1,34 @@
+---
+import { site } from '../lib/site';
+
+interface Props {
+  title?: string;
+  body?: string;
+}
+
+const {
+  title = 'Ready to move your next load?',
+  body = 'Share your lane, cargo, and schedule—we’ll respond through sales with a practical quote and next steps.',
+} = Astro.props;
+---
+
+<section id="cta" class="border-y-2 border-signal-line/30 bg-hero-deep text-white section-y">
+  <div class="content-max text-center">
+    <h2 class="font-display text-3xl font-bold tracking-tight md:text-4xl">{title}</h2>
+    <p class="mx-auto mt-4 max-w-xl text-base text-white/75 md:text-lg">{body}</p>
+    <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <a href={site.primaryCtaHref} class="btn-primary w-full sm:w-auto">
+        Request a quote
+      </a>
+      <a href={site.phoneTel} class="btn-ghost-hero w-full sm:w-auto">
+        Call {site.phone}
+      </a>
+    </div>
+    <p class="mt-6 text-sm text-white/55">
+      <a href={`mailto:${site.emailSales}`} class="underline-offset-2 hover:underline">
+        {site.emailSales}
+      </a>
+      · Office {site.hoursOffice} · Operations {site.hoursOps}
+    </p>
+  </div>
+</section>

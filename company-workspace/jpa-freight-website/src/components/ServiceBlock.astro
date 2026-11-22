@@ -1,0 +1,40 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  body: string;
+  bullets?: string[];
+  ctaHref?: string;
+  ctaLabel?: string;
+}
+
+const { id, title, body, bullets, ctaHref, ctaLabel } = Astro.props;
+---
+
+<section id={id} class="section-y border-t border-border scroll-mt-24">
+  <div class="content-max">
+    <h2 class="font-display text-3xl font-bold tracking-tight text-ink md:text-4xl">{title}</h2>
+    <p class="mt-4 max-w-prose text-base leading-relaxed text-ink-muted md:text-lg">{body}</p>
+    {
+      bullets && (
+        <ul class="mt-6 space-y-2 text-ink" role="list">
+          {bullets.map((b) => (
+            <li class="flex gap-2 text-base">
+              <span class="text-signal-line font-bold" aria-hidden="true">
+                —
+              </span>
+              {b}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    {
+      ctaHref && ctaLabel && (
+        <a href={ctaHref} class="btn-primary mt-8 inline-flex">
+          {ctaLabel}
+        </a>
+      )
+    }
+  </div>
+</section>

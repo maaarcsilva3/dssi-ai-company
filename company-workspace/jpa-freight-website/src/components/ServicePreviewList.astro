@@ -1,0 +1,60 @@
+---
+import { withBase } from '../lib/site';
+
+const services = [
+  {
+    href: withBase('/services#hauling'),
+    title: 'Nationwide hauling',
+    body: 'Freight across all regions of the Philippines—aligned with your operational window.',
+  },
+  {
+    href: withBase('/services#vas'),
+    title: 'Value-added services',
+    body: '24×7 customer service, on-site maintenance, and GPS on every unit.',
+  },
+  {
+    href: withBase('/services#helper'),
+    title: 'Hire a Helper',
+    body: 'Extra manpower for loading, unloading, and site handling when the job demands it.',
+  },
+];
+---
+
+<section id="services-preview" class="section-y bg-surface">
+  <div class="content-max">
+    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-accent">What we do</p>
+    <h2 class="mt-2 font-display text-3xl font-bold tracking-tight text-ink md:text-4xl">
+      Hauling and support built for real shipments
+    </h2>
+    <p class="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted md:text-lg">
+      We haul freight nationwide and back it with services that keep loads moving—24×7 customer
+      service, maintenance on site, GPS on all units, and optional helper support when the job
+      demands it.
+    </p>
+    <ul class="mt-10 divide-y divide-border border-y border-border" role="list">
+      {
+        services.map((s) => (
+          <li>
+            <a
+              href={s.href}
+              class="group flex flex-col gap-2 py-6 transition hover:bg-surface-elevated/60 md:flex-row md:items-center md:justify-between md:px-4"
+            >
+              <div>
+                <h3 class="font-display text-xl font-bold text-ink group-hover:text-accent">
+                  {s.title}
+                </h3>
+                <p class="mt-1 text-sm text-ink-muted md:max-w-lg">{s.body}</p>
+              </div>
+              <span class="text-sm font-semibold text-accent shrink-0">Explore →</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="mt-8">
+      <a href={withBase('/services')} class="text-sm font-semibold text-accent hover:underline">
+        View all services →
+      </a>
+    </p>
+  </div>
+</section>

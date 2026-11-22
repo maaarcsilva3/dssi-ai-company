@@ -1,0 +1,197 @@
+@import "tailwindcss";
+@import "@fontsource/barlow-condensed/700.css";
+@import "@fontsource/barlow-condensed/800.css";
+@import "@fontsource/outfit/400.css";
+@import "@fontsource/outfit/500.css";
+@import "@fontsource/outfit/600.css";
+
+@theme {
+  --font-display: "Barlow Condensed", sans-serif;
+  --font-sans: "Outfit", sans-serif;
+
+  --color-ink: #0f1419;
+  --color-ink-muted: #5a6570;
+  --color-surface: #e8ebee;
+  --color-surface-elevated: #ffffff;
+  --color-border: #c2c9d1;
+
+  --color-hero-deep: #12161c;
+  --color-hero-mist: #2c3540;
+  --color-hero-asphalt: #1a1f26;
+
+  --color-accent: #e85c2b;
+  --color-accent-hover: #c94e24;
+  --color-accent-ink: #0f1419;
+  --color-signal-line: #f0b429;
+  --color-signal-muted: #d4dce4;
+
+  --color-error: #c53030;
+
+  --color-map-land: #2a3440;
+  --color-map-region-active: #f0b429;
+  --color-map-region-idle: #3d4a56;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-surface text-ink font-sans antialiased;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-signal-line) 35%, white);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal-line);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3.5 text-sm font-semibold text-accent-ink transition duration-200;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 35%, transparent);
+  }
+
+  .btn-ghost-hero {
+    @apply inline-flex items-center justify-center rounded-sm border border-white/35 px-5 py-3.5 text-sm font-semibold text-white transition duration-200;
+  }
+
+  .btn-ghost-hero:hover {
+    @apply border-white bg-white/10;
+  }
+
+  .btn-ghost-light {
+    @apply inline-flex items-center justify-center rounded-sm border border-border px-5 py-3.5 text-sm font-semibold text-ink transition duration-200 hover:bg-surface;
+  }
+
+  .section-y {
+    @apply py-14 md:py-20 lg:py-24;
+  }
+
+  .content-max {
+  @apply mx-auto max-w-6xl px-5 md:px-8;
+  }
+
+  .hero-scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(18, 22, 28, 0.78) 0%,
+      rgba(18, 22, 28, 0.4) 42%,
+      rgba(18, 22, 28, 0.85) 100%
+    );
+  }
+
+  @media (min-width: 1024px) {
+    .hero-scrim {
+      background:
+        linear-gradient(
+          90deg,
+          rgba(18, 22, 28, 0.92) 0%,
+          rgba(18, 22, 28, 0.6) 40%,
+          transparent 72%
+        ),
+        linear-gradient(
+          180deg,
+          rgba(18, 22, 28, 0.5) 0%,
+          transparent 40%,
+          rgba(18, 22, 28, 0.6) 100%
+        );
+    }
+  }
+
+  .hero-mist {
+    background: linear-gradient(
+      125deg,
+      var(--color-hero-deep) 0%,
+      var(--color-hero-mist) 55%,
+      #3d4a56 100%
+    );
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ken-burns {
+  from {
+    transform: scale(1.03);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes region-emphasis {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-rise {
+  animation: rise-in 0.7s ease-out both;
+}
+
+.animate-rise-delay-1 {
+  animation: rise-in 0.7s ease-out 0.12s both;
+}
+
+.animate-rise-delay-2 {
+  animation: rise-in 0.7s ease-out 0.24s both;
+}
+
+.animate-rise-delay-3 {
+  animation: rise-in 0.7s ease-out 0.36s both;
+}
+
+.hero-bg {
+  animation: ken-burns 22s ease-in-out alternate infinite;
+  will-change: transform;
+}
+
+.coverage-map.is-visible .map-region-active {
+  animation: region-emphasis 0.6s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-rise,
+  .animate-rise-delay-1,
+  .animate-rise-delay-2,
+  .animate-rise-delay-3,
+  .hero-bg,
+  .coverage-map.is-visible .map-region-active {
+    animation: none !important;
+  }
+
+  .btn-primary:hover {
+    transform: none;
+  }
+}
