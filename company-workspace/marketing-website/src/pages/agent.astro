@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import PageHeader from '../components/PageHeader.astro';
+import AgentDemo from '../components/AgentDemo.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site } from '../lib/site';
+---
+
+<BaseLayout
+  title={`Data agent demo | ${site.name}`}
+  description="Interactive preview of DSSI's agentic AI layer: ask questions over connected operational and warehouse data. Demo uses scripted answers—no live LLM on this site."
+>
+  <Header />
+  <PageHeader
+    eyebrow="Product preview"
+    title="Ask your operational data"
+    subtitle="This thin demo shows how a DSSI data agent can answer anything about the data it has—orders, shipments, exceptions, inventory—once your systems and warehouse are connected."
+  />
+
+  <section class="bg-surface-elevated">
+    <div class="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
+      <p class="max-w-3xl text-base leading-relaxed text-ink-muted md:text-lg">
+        In production, the agent runs against <strong class="font-semibold text-ink">your</strong> warehouse and
+        operational apps with scoped credentials, audit logs, and human escalation. Here you are looking at
+        <strong class="font-semibold text-ink">Northline Supply Co.</strong>, a fictional distributor, with
+        canned answers so you can feel the flow without API keys.
+      </p>
+      <div class="mt-10">
+        <AgentDemo />
+      </div>
+      <p class="mt-6 max-w-3xl text-sm text-ink-muted">
+        Claim on this preview: your team can ask anything about the data connected to the agent—not the public
+        web. Roadmap features (live models, Slack/Teams channels, role-based data masks) are scoped per engagement.
+      </p>
+    </div>
+  </section>
+
+  <section class="border-t border-border bg-surface">
+    <div class="mx-auto max-w-6xl px-5 py-16 md:px-8">
+      <h2 class="font-display text-2xl font-bold tracking-tight md:text-3xl">What this demo is not</h2>
+      <ul class="mt-6 max-w-3xl list-disc space-y-2 pl-5 text-sm leading-relaxed text-ink-muted">
+        <li>Not a live large language model call—responses are keyword-matched scripts in the browser.</li>
+        <li>Not a commitment to model vendor, hosting, or per-seat pricing; those are decided in build scope.</li>
+        <li>Not a substitute for the Operational Gap Audit—you still start with process and data trust.</li>
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand
+    headline="Want this on your data—not a fictional warehouse?"
+    body="Start with an Operational Gap Audit. We map the process, then design warehouse and agent guardrails together."
+  />
+  <Footer />
+</BaseLayout>

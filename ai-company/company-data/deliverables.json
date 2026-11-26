@@ -308,5 +308,35 @@
     "createdAt": "2026-11-22T15:35:35.258Z",
     "sessionId": "ses_49bd1bff6650bf1c4dba10c0",
     "machine": "Marcs-iMac-Pro.local"
+  },
+  {
+    "id": "del_mwx4uho0_yecbby",
+    "role": "engineer",
+    "title": "DSSI marketing site — agentic AI mock (homepage + /agent)",
+    "kind": "product-build",
+    "body": "Extended Astro DSSI marketing site with client-only agentic AI mock. Primary CTA Start an audit → /audit; secondary Try the data agent demo → /agent. Added AgenticAiSection on homepage, /agent page with AgentDemo (scripted keyword Q&A over fictional warehouse context), agentDemo.ts, Header nav Data agent. Build PASS (7 pages). No LLM/API keys. Tech notes: company-workspace/marketing-website/tech-notes-agentic-ai.md. Preview: cd marketing-website && npm run dev → http://localhost:4321 and /agent. NEEDS CEO: replace hello@dssi.example before real public traffic. Non-goals: live RAG/LLM, auth, real connectors.",
+    "createdAt": "2026-11-26T05:49:29.712Z",
+    "sessionId": "ses_ed4ab5efe5ae317108d48146",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwx4ujcm_jrssfp",
+    "role": "marketer",
+    "title": "DSSI agentic AI — positioning & launch copy pack",
+    "kind": "gtm",
+    "body": "Positioning: agentic AI is step four after gap→custom systems→warehouse; audit remains front door. Audience ASSUMPTION: mid-market ops/finance leaders. Promise: ask anything about the data it has (CEO-approved claim) with demo disclaimers. Pack includes homepage section copy, /agent hero/how-it-works/demo chrome/sample Q&A/FAQ/CTA band, claims matrix, channels + 2-week outline ≤$5k lean paid mix. Path: company-workspace/marketing-website/copy-pack-agentic-ai.md. NEEDS CEO: security one-liner, real inbox before paid traffic, whether to price AI layer on site (recommend defer to SOW).",
+    "createdAt": "2026-11-26T05:49:31.894Z",
+    "sessionId": "ses_ed4ab5efe5ae317108d48146",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwx4umc5_pe3sik",
+    "role": "finance",
+    "title": "DSSI agentic AI — $5k project impact & launch economics",
+    "kind": "finance",
+    "body": "Envelope: ~$3.5k build/design ASSUMPTION, $350 host/domain/email, $150 tooling, $500 light paid, $500 contingency = $5k. Recommend Option A: demo is positioning only; audit price unchanged (audit fee UNKNOWN; midpoint $9k ASSUMPTION). Mock marginal cost ~$0; future real agent cost-to-serve UNKNOWN/$500–$5k/mo ASSUMPTION. Scenarios incremental audit revenue ~+$0.7k to +$24.5k/mo ASSUMPTION. Default-alive under $5k if ≥1 audit in ~2–3 months. CONDITIONAL GO for public mock launch if demo labeled illustrative, claim scoped to connected data post-integration, audit CTA primary, no live LLM this pass. Path: company-workspace/marketing-website/finance-agentic-ai-impact.md. NEEDS CEO: audit price floor, disclaimer sign-off, 90-day paid cap.",
+    "createdAt": "2026-11-26T05:49:35.765Z",
+    "sessionId": "ses_ed4ab5efe5ae317108d48146",
+    "machine": "DESKTOP-1J3PTJN"
   }
 ]
