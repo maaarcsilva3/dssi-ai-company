@@ -12,7 +12,7 @@
     "build:docker": "BASE_PATH=/ npm run build",
     "deploy": "npm run build:docker && docker compose up -d --force-recreate",
     "start:docker": "docker compose up -d --force-recreate",
-    "clean": "node -e \"const fs=require('fs');const path=require('path');const d='dist';if(!fs.existsSync(d)){fs.mkdirSync(d,{recursive:true});process.exit(0)}for(const name of fs.readdirSync(d))fs.rmSync(path.join(d,name),{recursive:true,force:true})\"",
+    "clean": "node -e \"const fs=require('fs');const path=require('path');const d='dist';if(!fs.existsSync(d)){fs.mkdirSync(d,{recursive:true});process.exit(0)}for(const name of fs.readdirSync(d)){if(name==='.env')continue;fs.rmSync(path.join(d,name),{recursive:true,force:true})}\"",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.server.json --noEmit",
     "test": "vitest run"
   },

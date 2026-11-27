@@ -44,3 +44,9 @@ export function formatAmountPlain(amount: string | number): string {
   if (!Number.isFinite(n)) return '';
   return PLAIN_AMOUNT.format(n);
 }
+
+/** Format a money input on blur; leaves the field unchanged when empty or invalid. */
+export function formatAmountOnBlur(value: string): string {
+  const preview = formatAmountPlain(value);
+  return preview && value.trim() ? preview : value;
+}

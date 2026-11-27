@@ -191,8 +191,38 @@ export interface Attachment {
 
 export type EwtKind = 'products' | 'service';
 
+export interface PayablePdcLine {
+  id: number;
+  pdc_no: string | null;
+  pdc_date: string | null;
+  amount: string;
+  sort_order: number;
+}
+
+/** One post-dated check paying several invoices in full; `amount` is the sum of their nets. */
+export interface PayablePdcGroup {
+  key: string;
+  pdc_no: string | null;
+  pdc_date: string | null;
+  amount: string;
+  invoice_ids: number[];
+}
+
+/** Cross-payable shared check from separate batch create (mode B). Siblings share `id`. */
+export interface PayableSharedPdcBatch {
+  id: number;
+  pdc_no: string | null;
+  pdc_date: string | null;
+  amount_total: string;
+  members: {
+    payable_id: number;
+    invoice_no: string | null;
+    net: string;
+  }[];
+}
+
 export interface PayableInvoice {
-  id?: number;
+  id: number;
   invoice_no: string | null;
   invoice_date: string | null;
   payment_term_id: number | null;
@@ -202,6 +232,10 @@ export interface PayableInvoice {
   ewt_amount: string;
   net_amount: string;
   sort_order: number;
+  /** Payables only: this invoice's own checks. Empty when it is on a shared PDC. */
+  pdc_lines?: PayablePdcLine[];
+  /** Payables only: key of the shared PDC in `Payable.pdc_groups` that pays this invoice. */
+  pdc_group?: string | null;
 }
 
 export interface StatusHistoryEntry {
@@ -270,17 +304,14 @@ export interface Payable {
   thumbnail_id: number | null;
   invoice_count: number;
   pdc_count?: number;
-  pdc_lines?: {
-    id?: number;
-    pdc_no: string | null;
-    pdc_date: string | null;
-    amount: string;
-    sort_order: number;
-  }[];
   /** status_id → custom field value collected when entering that status */
   status_field_values?: Record<string, string>;
   attachments?: Attachment[];
   invoices?: PayableInvoice[];
+  /** Payables detail only. */
+  pdc_groups?: PayablePdcGroup[];
+  /** Payables detail only: locked sibling link for one shared check across separate payables. */
+  shared_pdc_batch?: PayableSharedPdcBatch;
 }
 
 export interface PayableList {

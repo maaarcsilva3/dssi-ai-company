@@ -19,6 +19,7 @@ import {
 import { HttpError, notFound } from '../lib/http';
 import { addDays } from '../lib/releaseWindow';
 import { idParam, isoDate, optionalText } from '../lib/validation';
+import { buildYearPivot } from '../lib/arYearPivot';
 import { removeStoredFiles } from './attachments';
 import { getSettings, todayForApp } from './settings';
 
@@ -386,6 +387,40 @@ arRouter.get('/summaries', async (req, res) => {
     params,
   );
   res.json({ items: rows });
+});
+
+arRouter.get('/summaries/year-pivot', async (req, res) => {
+  const { year } = z
+    .object({
+      year: z.coerce.number().int().min(2000).max(2100),
+    })
+    .parse(req.query);
+
+  const { rows } = await pool.query<{
+    company: string;
+    month_num: number;
+    total: string;
+  }>(
+    `SELECT c.name AS company,
+            EXTRACT(MONTH FROM date_trunc('month', COALESCE(s.coverage_start, s.invoice_date))::date)::int
+              AS month_num,
+            SUM(s.grand_total::numeric) AS total
+       FROM ar_summaries s
+       JOIN ar_clients c ON c.id = s.client_id
+      WHERE EXISTS (SELECT 1 FROM ar_detail_entries d0 WHERE d0.summary_id = s.id)
+        AND EXTRACT(YEAR FROM COALESCE(s.coverage_start, s.invoice_date)::date) = $1
+      GROUP BY c.id, c.name, month_num
+      ORDER BY lower(c.name), month_num`,
+    [year],
+  );
+
+  const aggregates = rows.map((r) => ({
+    company: r.company,
+    monthNum: r.month_num,
+    total: Number(r.total),
+  }));
+
+  res.json(buildYearPivot(year, aggregates));
 });
 
 arRouter.get('/summaries/:id', async (req, res) => {

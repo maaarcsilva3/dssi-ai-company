@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, errorMessage } from '../api';
 import { ErrorBox, Modal } from '../components';
-import { formatMoney } from '../format';
+import { formatAmountOnBlur, formatMoney } from '../format';
 import { useAuth } from '../auth';
 
 interface LiquidationRow {
@@ -146,6 +146,10 @@ export default function LiquidationsPage() {
                   inputMode="decimal"
                   value={form.advance_amount}
                   onChange={(e) => setForm({ ...form, advance_amount: e.target.value })}
+                  onBlur={(e) => {
+                    const next = formatAmountOnBlur(e.target.value);
+                    if (next !== form.advance_amount) setForm({ ...form, advance_amount: next });
+                  }}
                   required
                   placeholder="0.00"
                 />

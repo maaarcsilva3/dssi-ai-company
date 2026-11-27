@@ -110,21 +110,60 @@ const fuelFields = {
   fuel_delivery_receipt: optionalText,
 };
 
-export const invoiceLineSchema = z.object({
-  invoice_no: optionalText,
-  invoice_date: optionalDate,
-  /** Used when the line (or supplier) has no payment term. */
-  due_date: optionalDate,
-  /** Optional override of the supplier's default payment term. */
-  payment_term_id: optionalId,
-  gross_amount: money,
-});
-
 export const pdcLineSchema = z.object({
   pdc_no: optionalText,
   pdc_date: optionalDate,
   amount: money,
 });
+
+const pdcLinesSchema = z.array(pdcLineSchema).max(20);
+
+const pdcGroupKey = z.string().trim().min(1).max(64);
+
+/** One shared PDC; its amount is the sum of the nets of the invoices whose `pdc_group` is `key`. */
+const pdcGroupsSchema = z
+  .array(z.object({ key: pdcGroupKey, pdc_no: optionalText, pdc_date: optionalDate }))
+  .max(100)
+  .refine((groups) => new Set(groups.map((g) => g.key)).size === groups.length, 'Shared PDC keys must be unique')
+  .optional();
+
+/** Cross-payable shared check (separate batch create mode B). `null` on PUT means unlink — forbidden when linked. */
+export const sharedPdcBatchSchema = z
+  .object({
+    pdc_no: optionalText,
+    pdc_date: optionalDate,
+  })
+  .nullable()
+  .optional();
+
+/** An invoice is paid by its own `pdc_lines` or by the shared PDC named in `pdc_group`, never both. */
+const invoicePdcFields = {
+  /** Post-dated checks for this invoice alone; must sum to its net when the method is PDC. */
+  pdc_lines: pdcLinesSchema.optional(),
+  /** Key of the shared PDC in `pdc_groups`; null leaves any shared PDC. */
+  pdc_group: pdcGroupKey.nullable().optional(),
+};
+
+function rejectDoubleCoverage(v: { pdc_lines?: unknown[]; pdc_group?: string | null }, ctx: z.RefinementCtx) {
+  if (v.pdc_group != null && v.pdc_lines?.length) {
+    ctx.addIssue({ code: 'custom', message: 'An invoice on a shared PDC cannot also have its own PDC lines', path: ['pdc_group'] });
+  }
+}
+
+export const invoiceLineSchema = z
+  .object({
+    /** Stored invoice id on edit; PDC fields left out keep the PDC coverage stored under it. */
+    id: optionalId,
+    invoice_no: optionalText,
+    invoice_date: optionalDate,
+    /** Used when the line (or supplier) has no payment term. */
+    due_date: optionalDate,
+    /** Optional override of the supplier's default payment term. */
+    payment_term_id: optionalId,
+    gross_amount: money,
+    ...invoicePdcFields,
+  })
+  .superRefine(rejectDoubleCoverage);
 
 export type InvoiceLineInput = z.infer<typeof invoiceLineSchema>;
 
@@ -148,6 +187,8 @@ export const payableSchema = z
     /** Gross amount when no invoice lines; defaults to amount when taxes are off. */
     gross_amount: money.optional(),
     invoices: z.array(invoiceLineSchema).min(1).max(100).optional(),
+    pdc_groups: pdcGroupsSchema,
+    shared_pdc_batch: sharedPdcBatchSchema,
     apply_vat: z.boolean().optional().default(false),
     vat_rate: z.coerce.number().min(0).max(100).optional().default(12),
     apply_ewt: z.boolean().optional().default(false),
@@ -170,8 +211,6 @@ export const payableSchema = z
     source_account_id: optionalId,
     /** Save as draft (excluded from release totals). */
     is_draft: z.boolean().optional().default(false),
-    /** Post-dated check allocation (sums to net when method is PDC). */
-    pdc_lines: z.array(pdcLineSchema).max(20).optional(),
     ...fuelFields,
   })
   .superRefine((v, ctx) => {
@@ -212,6 +251,15 @@ export const payableBatchSchema = z
     if (v.apply_ewt && !v.ewt_kind) {
       ctx.addIssue({ code: 'custom', message: 'Select products or service for EWT', path: ['ewt_kind'] });
     }
+    v.invoices.forEach((inv, i) => {
+      if (inv.pdc_group != null) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Shared PDC groups are not supported on batch create; send per-payable pdc_lines instead',
+          path: ['invoices', i, 'pdc_group'],
+        });
+      }
+    });
   });
 
 export type PayableBatchInput = z.infer<typeof payableBatchSchema>;
@@ -268,7 +316,13 @@ export const statusPatchSchema = z.object({
   /** Required when destination status defines custom fields. */
   custom_field_value: optionalText,
   custom_field_values: z.record(z.string(), z.union([z.string(), z.null()])).optional(),
-  pdc_lines: z.array(pdcLineSchema).max(20).optional(),
+  /** PDC coverage per stored invoice id; omitted invoices keep their stored coverage. */
+  invoices: z
+    .array(z.object({ id: z.coerce.number().int().positive(), ...invoicePdcFields }).superRefine(rejectDoubleCoverage))
+    .max(100)
+    .optional(),
+  pdc_groups: pdcGroupsSchema,
+  shared_pdc_batch: sharedPdcBatchSchema,
 });
 
 export const sourceAccountSchema = z.object({

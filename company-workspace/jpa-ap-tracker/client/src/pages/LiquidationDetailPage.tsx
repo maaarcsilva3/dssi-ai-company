@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, errorMessage } from '../api';
 import { ConfirmDialog, ErrorBox, Modal, type ConfirmRequest } from '../components';
-import { formatMoney } from '../format';
+import { formatAmountOnBlur, formatMoney } from '../format';
 import { useAuth } from '../auth';
 
 interface Line {
@@ -177,8 +177,13 @@ export default function LiquidationDetailPage() {
                 <label className="field">
                   <span className="field-label">Amount</span>
                   <input
+                    inputMode="decimal"
                     value={line.amount}
                     onChange={(e) => setLine({ ...line, amount: e.target.value })}
+                    onBlur={(e) => {
+                      const next = formatAmountOnBlur(e.target.value);
+                      if (next !== line.amount) setLine({ ...line, amount: next });
+                    }}
                     required
                   />
                 </label>

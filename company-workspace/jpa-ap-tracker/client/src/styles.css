@@ -1908,7 +1908,8 @@ input[type='color'] {
   font-weight: 600;
 }
 
-.invoice-calc {
+.invoice-calc,
+.invoice-pdc {
   grid-column: 1 / -1;
 }
 

@@ -20,6 +20,7 @@ import { FuelDetailsRow, isFuelType } from '../components/FuelDetails';
 import { allowedPayableStatusIdsForRow, StatusChangeModal } from '../components/StatusChangeModal';
 import { canViewStatusHistory, StatusHistoryPanel } from '../components/StatusHistoryPanel';
 import { formatDate, formatMoney } from '../format';
+import type { PdcStatusPayload } from '../lib/pdc';
 
 const PAGE_SIZE = 50;
 
@@ -148,7 +149,7 @@ export default function PayablesPage() {
       source_account_id,
       assigned_to,
       custom_field_values,
-      pdc_lines,
+      pdc,
     }: {
       id: number;
       statusId: number;
@@ -159,7 +160,7 @@ export default function PayablesPage() {
       source_account_id?: number | null;
       assigned_to?: number | null;
       custom_field_values?: Record<string, string>;
-      pdc_lines?: { pdc_no: string | null; pdc_date: string | null; amount: string }[];
+      pdc?: PdcStatusPayload;
     }) =>
       api.patch(`${ledger.apiBase}/${id}/status`, {
         status_id: statusId,
@@ -172,7 +173,7 @@ export default function PayablesPage() {
         ...(custom_field_values && Object.keys(custom_field_values).length
           ? { custom_field_values }
           : {}),
-        ...(pdc_lines ? { pdc_lines } : {}),
+        ...pdc,
       }),
     onSuccess: () => {
       setStatusChange(null);
@@ -614,7 +615,7 @@ export default function PayablesPage() {
             source_account_id,
             assigned_to,
             custom_field_values,
-            pdc_lines,
+            pdc,
           }) => {
             setActionError(null);
             changeStatus.mutate({
@@ -627,7 +628,7 @@ export default function PayablesPage() {
               source_account_id,
               assigned_to,
               custom_field_values,
-              pdc_lines,
+              pdc,
             });
           }}
         />

@@ -14,6 +14,22 @@ export function InvoiceLinesPanel({ payableId, colSpan }: { payableId: number; c
     queryFn: () => api.get<Payable>(`${ledger.apiBase}/${payableId}`),
   });
   const invoices = detail.data?.invoices ?? [];
+  const sharedPdcByInvoice = new Map(
+    (detail.data?.pdc_groups ?? []).flatMap((g) => g.invoice_ids.map((id) => [id, g] as const)),
+  );
+  const showPdc = invoices.some((inv) => inv.pdc_lines?.length || sharedPdcByInvoice.has(inv.id));
+  const invoiceNumber = (id: number) => invoices.findIndex((inv) => inv.id === id) + 1;
+  const sharedPdcCell = (invoiceId: number) => {
+    const group = sharedPdcByInvoice.get(invoiceId);
+    return (
+      group && (
+        <div className="small">
+          Shared: {group.pdc_no ?? '-'} · {group.pdc_date ? formatDate(group.pdc_date) : '-'} · {formatMoney(group.amount)}
+          <div className="muted">for #{group.invoice_ids.map(invoiceNumber).join(', #')}</div>
+        </div>
+      )
+    );
+  };
 
   return (
     <tr className="invoice-accordion-row">
@@ -35,6 +51,7 @@ export function InvoiceLinesPanel({ payableId, colSpan }: { payableId: number; c
                 <th className="num">Net sales</th>
                 <th className="num">EWT</th>
                 <th className="num">Total net</th>
+                {showPdc && <th>PDC</th>}
               </tr>
             </thead>
             <tbody>
@@ -64,6 +81,21 @@ export function InvoiceLinesPanel({ payableId, colSpan }: { payableId: number; c
                   <td className="num">{formatMoney(Number(inv.gross_amount) - Number(inv.vat_amount))}</td>
                   <td className="num">{formatMoney(inv.ewt_amount)}</td>
                   <td className="num">{formatMoney(inv.net_amount)}</td>
+                  {showPdc && (
+                    <td>
+                      {sharedPdcCell(inv.id) ??
+                        (inv.pdc_lines?.length ? (
+                          inv.pdc_lines.map((line) => (
+                            <div key={line.id} className="small">
+                              {line.pdc_no ?? '-'} · {line.pdc_date ? formatDate(line.pdc_date) : '-'} ·{' '}
+                              {formatMoney(line.amount)}
+                            </div>
+                          ))
+                        ) : (
+                          <span className="muted">-</span>
+                        ))}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

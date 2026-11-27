@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { api, errorMessage, type Payable, type PayableStatus } from '../api';
 import { useAuth } from '../auth';
 import { formatMoney } from '../format';
@@ -8,7 +9,17 @@ import { isReserveStatus, useLedger } from '../ledger';
 import { StatusHistoryPanel } from './StatusHistoryPanel';
 import { WorkflowStepper } from './WorkflowStepper';
 import { PdcSchedulePanel } from './PdcSchedulePanel';
-import { isPdcPaymentMethodName, newPdcLine, sumPdcAmounts, type PdcLineDraft } from '../lib/pdc';
+import {
+  invoicePdcPayload,
+  isPdcPaymentMethodName,
+  pdcLinesFromApi,
+  pdcScheduleProblem,
+  sharedPdcsFromApi,
+  sharedPdcsPayload,
+  type PdcLineDraft,
+  type PdcStatusPayload,
+  type SharedPdcDrafts,
+} from '../lib/pdc';
 import { useLedgerStatuses } from '../hooks';
 
 /**
@@ -72,7 +83,7 @@ export function StatusChangeModal({
     source_account_id: number | null | undefined;
     assigned_to: number | null | undefined;
     custom_field_values: Record<string, string>;
-    pdc_lines?: { pdc_no: string | null; pdc_date: string | null; amount: string }[];
+    pdc?: PdcStatusPayload;
   }) => void;
   onClose: () => void;
   pending?: boolean;
@@ -109,7 +120,27 @@ export function StatusChangeModal({
     isPayable &&
     isPdcPaymentMethodName(payable.payment_method_name) &&
     (nextStatus.sort_order === 20 || nextStatus.sort_order === 30);
-  const [pdcLines, setPdcLines] = useState<PdcLineDraft[]>([]);
+  const detail = useQuery({
+    queryKey: ['ledger', ledger.kind, 'detail', payable.id],
+    queryFn: () => api.get<Payable>(`${ledger.apiBase}/${payable.id}`),
+    enabled: needsPdc,
+    staleTime: 0,
+    refetchOnMount: 'always',
+  });
+  /** Edited PDC lines by invoice id; untouched invoices show their stored lines. */
+  const [pdcEdits, setPdcEdits] = useState<Record<number, PdcLineDraft[]>>({});
+  /** Edited check no./date by shared PDC key; untouched ones show what is stored. */
+  const [sharedPdcEdits, setSharedPdcEdits] = useState<SharedPdcDrafts>({});
+  const pdcInvoices = (detail.data?.invoices ?? []).map((inv, i) => ({
+    id: inv.id,
+    label: `Invoice ${i + 1}${inv.invoice_no ? ` (${inv.invoice_no})` : ''}`,
+    net: Number(inv.net_amount),
+    pdc_group: inv.pdc_group ?? null,
+    lines: pdcEdits[inv.id] ?? pdcLinesFromApi(inv.pdc_lines),
+  }));
+  const sharedPdcs: SharedPdcDrafts = { ...sharedPdcsFromApi(detail.data?.pdc_groups), ...sharedPdcEdits };
+  const setSharedPdc = (key: string, patch: Partial<SharedPdcDrafts[string]>) =>
+    setSharedPdcEdits((prev) => ({ ...prev, [key]: { ...sharedPdcs[key]!, ...patch } }));
 
   const accounts = useSourceAccounts(false, needsSource);
   const assignees = useAssignees();
@@ -131,15 +162,8 @@ export function StatusChangeModal({
     setCustomFieldValues({});
     setFiles([]);
     setError(null);
-    const existingPdc =
-      payable.pdc_lines?.map((line) =>
-        newPdcLine({
-          pdc_no: line.pdc_no ?? '',
-          pdc_date: line.pdc_date ?? '',
-          amount: line.amount,
-        }),
-      ) ?? [];
-    setPdcLines(existingPdc.length ? existingPdc : needsPdc ? [newPdcLine()] : []);
+    setPdcEdits({});
+    setSharedPdcEdits({});
 
     if (isAnytimeStatus) {
       const bound = (assignees.data ?? []).filter((u) =>
@@ -156,7 +180,7 @@ export function StatusChangeModal({
     } else {
       setAssignedTo(payable.assigned_to != null ? String(payable.assigned_to) : '');
     }
-  }, [payable, nextStatus, isAnytimeStatus, assignees.data, needsPdc]);
+  }, [payable, nextStatus, isAnytimeStatus, assignees.data]);
 
   useEffect(() => {
     if (!needsSource || sourceAccountId || !accounts.data?.length) return;
@@ -200,15 +224,17 @@ export function StatusChangeModal({
       setError('Upload at least one file before setting this status.');
       return;
     }
-    const net = Number(payable.amount);
     if (needsPdc) {
-      if (!pdcLines.length) {
-        setError('Add at least one PDC line.');
+      if (!detail.data) {
+        setError('Invoice PDC schedules are still loading.');
         return;
       }
-      if (Math.abs(sumPdcAmounts(pdcLines) - net) > 0.01) {
-        setError('PDC scheduled total must equal the payable net amount.');
-        return;
+      for (const inv of pdcInvoices) {
+        const problem = inv.pdc_group ? null : pdcScheduleProblem(inv.lines, inv.net);
+        if (problem) {
+          setError(`${inv.label}: ${problem}`);
+          return;
+        }
       }
     }
 
@@ -251,11 +277,13 @@ export function StatusChangeModal({
         custom_field_values: resolvedCustomValues,
         ...(needsPdc
           ? {
-              pdc_lines: pdcLines.map((line) => ({
-                pdc_no: line.pdc_no.trim() || null,
-                pdc_date: line.pdc_date || null,
-                amount: line.amount.replace(/,/g, ''),
-              })),
+              pdc: {
+                invoices: pdcInvoices.map((inv) => ({
+                  id: inv.id,
+                  ...invoicePdcPayload({ pdc_group: inv.pdc_group, pdc_lines: inv.lines }),
+                })),
+                pdc_groups: sharedPdcsPayload(pdcInvoices, sharedPdcs),
+              },
             }
           : {}),
       });
@@ -283,13 +311,54 @@ export function StatusChangeModal({
           {payable.invoice_no ? ` · ${payable.invoice_no}` : ''} · {formatMoney(payable.amount)}
         </p>
 
-        {needsPdc && (
-          <PdcSchedulePanel
-            lines={pdcLines}
-            onChange={setPdcLines}
-            netAmount={Number(payable.amount)}
-          />
-        )}
+        {needsPdc && detail.isLoading && <p className="muted small">Loading invoice PDC schedules...</p>}
+        {needsPdc && detail.error && <ErrorBox error={errorMessage(detail.error)} />}
+        {needsPdc &&
+          pdcInvoices
+            .filter((inv) => !inv.pdc_group)
+            .map((inv) => (
+              <div key={inv.id} className="invoice-row">
+                <div className="invoice-row-title">
+                  {inv.label} · net {formatMoney(inv.net)}
+                </div>
+                <PdcSchedulePanel
+                  lines={inv.lines}
+                  onChange={(lines) => setPdcEdits((prev) => ({ ...prev, [inv.id]: lines }))}
+                  netAmount={inv.net}
+                  describedById={`status-pdc-total-${inv.id}`}
+                />
+              </div>
+            ))}
+        {needsPdc &&
+          detail.data?.pdc_groups?.map((group) => (
+            <div key={group.key} className="invoice-row">
+              <div className="invoice-row-title">Shared PDC · {formatMoney(group.amount)}</div>
+              <p className="muted small">
+                One check for{' '}
+                {pdcInvoices
+                  .filter((inv) => inv.pdc_group === group.key)
+                  .map((inv) => inv.label)
+                  .join(', ')}
+              </p>
+              <div className="entry-sheet-grid">
+                <label className="field">
+                  <span className="field-label">PDC no.</span>
+                  <input
+                    value={sharedPdcs[group.key]?.pdc_no ?? ''}
+                    onChange={(e) => setSharedPdc(group.key, { pdc_no: e.target.value })}
+                  />
+                </label>
+                <label className="field">
+                  <span className="field-label">PDC date</span>
+                  <input
+                    type="date"
+                    value={sharedPdcs[group.key]?.pdc_date ?? ''}
+                    onChange={(e) => setSharedPdc(group.key, { pdc_date: e.target.value })}
+                  />
+                </label>
+              </div>
+            </div>
+          ))}
 
         <label>
           Remarks {needsRemarks ? '*' : '(optional)'}

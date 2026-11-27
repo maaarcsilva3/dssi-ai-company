@@ -2,8 +2,8 @@ import { Fragment, useEffect, useMemo, useRef, useState, type FormEvent } from '
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, ar2307FileUrl, errorMessage, qs } from '../api';
 import { ConfirmDialog, ErrorBox, Modal, type ConfirmRequest } from '../components';
-import { formatDateMdY, formatMoney } from '../format';
-import { downloadArMonthlySummary, downloadArSalesReport } from '../lib/arExport';
+import { formatAmountOnBlur, formatAmountPlain, formatDateMdY, formatMoney } from '../format';
+import { downloadArMonthlySummaryYearPivot, type YearPivotExport } from '../lib/arExport';
 import { useAuth } from '../auth';
 
 export type ReceivablesMode = 'details' | 'summary';
@@ -28,6 +28,7 @@ interface DetailRow {
   amount: string;
   client_name: string;
   aging_days: number | null;
+  summary_due_date: string | null;
 }
 
 interface SummaryRow {
@@ -86,7 +87,7 @@ export default function ReceivablesBillingPage({ mode }: { mode: ReceivablesMode
   const [dueFrom, setDueFrom] = useState('');
   const [dueTo, setDueTo] = useState('');
   const [month, setMonth] = useState(monthInput());
-  const [exporting, setExporting] = useState<'summary' | 'sales' | null>(null);
+  const [exporting, setExporting] = useState(false);
   const [ewtStatus, setEwtStatus] = useState('');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('');
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -355,81 +356,28 @@ export default function ReceivablesBillingPage({ mode }: { mode: ReceivablesMode
         </div>
         <div className="page-header-actions">
           {mode === 'summary' && (
-            <>
-              <button
-                type="button"
-                className="btn"
-                disabled={exporting != null || summaries.isLoading}
-                onClick={async () => {
-                  setExporting('summary');
-                  setError(null);
-                  try {
-                    downloadArMonthlySummary(filteredSummaryRows, month);
-                  } catch (e) {
-                    setError(errorMessage(e));
-                  } finally {
-                    setExporting(null);
-                  }
-                }}
-              >
-                {exporting === 'summary' ? 'Exporting…' : 'Download monthly summary'}
-              </button>
-              <button
-                type="button"
-                className="btn"
-                disabled={exporting != null || summaries.isLoading}
-                onClick={async () => {
-                  setExporting('sales');
-                  setError(null);
-                  try {
-                    const detailRes = await api.get<{ items: DetailRow[] }>(
-                      `/ar/details${qs({
-                        clientId: clientId || undefined,
-                        search: invoiceSearch.trim() || undefined,
-                        dueFrom: dueFrom || undefined,
-                        dueTo: dueTo || undefined,
-                      })}`,
-                    );
-                    const allowedInvoices = new Set(filteredSummaryRows.map((s) => s.invoice_no));
-                    const summaryByInvoice = new Map(
-                      filteredSummaryRows.map((s) => [s.invoice_no, s] as const),
-                    );
-                    const salesRows = detailRes.items
-                      .filter((d) => allowedInvoices.has(d.invoice_no))
-                      .map((d) => {
-                        const s = summaryByInvoice.get(d.invoice_no);
-                        return {
-                          client_name: d.client_name,
-                          invoice_no: d.invoice_no,
-                          billing_reference: s?.billing_reference ?? null,
-                          trip_type: s?.trip_type ?? null,
-                          trip_classification: s?.trip_classification ?? null,
-                          fleet_type: s?.fleet_type ?? null,
-                          service_type: s?.service_type ?? null,
-                          coverage_start: s?.coverage_start ?? null,
-                          coverage_end: s?.coverage_end ?? null,
-                          billing_date: d.billing_date,
-                          due_date: s?.due_date ?? null,
-                          reference: d.reference,
-                          origin: d.origin,
-                          destination: d.destination,
-                          entry_date: d.entry_date,
-                          amount: d.amount,
-                          payment_status: s?.payment_status,
-                          grand_total: s?.grand_total,
-                        };
-                      });
-                    downloadArSalesReport(salesRows, month);
-                  } catch (e) {
-                    setError(errorMessage(e));
-                  } finally {
-                    setExporting(null);
-                  }
-                }}
-              >
-                {exporting === 'sales' ? 'Exporting…' : 'Export monthly sales report'}
-              </button>
-            </>
+            <button
+              type="button"
+              className="btn"
+              disabled={exporting || !month}
+              onClick={async () => {
+                setExporting(true);
+                setError(null);
+                try {
+                  const year = month.slice(0, 4);
+                  const pivot = await api.get<YearPivotExport>(
+                    `/ar/summaries/year-pivot${qs({ year })}`,
+                  );
+                  downloadArMonthlySummaryYearPivot(pivot);
+                } catch (e) {
+                  setError(errorMessage(e));
+                } finally {
+                  setExporting(false);
+                }
+              }}
+            >
+              {exporting ? 'Exporting…' : 'Download monthly summary'}
+            </button>
           )}
           {mode === 'details' && canEdit && (
             <>
@@ -641,6 +589,10 @@ export default function ReceivablesBillingPage({ mode }: { mode: ReceivablesMode
                       inputMode="decimal"
                       value={detailForm.amount}
                       onChange={(e) => setDetailForm({ ...detailForm, amount: e.target.value })}
+                      onBlur={(e) => {
+                        const next = formatAmountOnBlur(e.target.value);
+                        if (next !== detailForm.amount) setDetailForm({ ...detailForm, amount: next });
+                      }}
                       required
                       placeholder="0.00"
                     />
@@ -707,6 +659,7 @@ export default function ReceivablesBillingPage({ mode }: { mode: ReceivablesMode
                     <th className="num">Amount</th>
                     <th>Billing date</th>
                     <th>Receiving date</th>
+                    <th>Due date</th>
                     <th>Aging</th>
                     <th>Reference</th>
                     {canEdit && <th></th>}
@@ -723,6 +676,7 @@ export default function ReceivablesBillingPage({ mode }: { mode: ReceivablesMode
                       <td className="num">{formatMoney(r.amount)}</td>
                       <td>{formatDateMdY(r.billing_date)}</td>
                       <td>{formatDateMdY(r.receiving_date)}</td>
+                      <td>{formatDateMdY(r.summary_due_date) || '—'}</td>
                       <td>
                         {r.aging_days == null ? '—' : `${r.aging_days}d`}
                       </td>
@@ -743,7 +697,7 @@ export default function ReceivablesBillingPage({ mode }: { mode: ReceivablesMode
                                   reference: r.reference ?? '',
                                   origin: r.origin ?? '',
                                   destination: r.destination ?? '',
-                                  amount: r.amount,
+                                  amount: r.amount ? formatAmountPlain(r.amount) : '',
                                 });
                                 setShowDetailForm(true);
                                 requestAnimationFrame(() => {
@@ -1056,9 +1010,14 @@ export default function ReceivablesBillingPage({ mode }: { mode: ReceivablesMode
                                   ))}
                                 </select>
                                 <input
+                                  inputMode="decimal"
                                   placeholder="Amount"
                                   value={deduction.amount}
                                   onChange={(e) => setDeduction({ ...deduction, amount: e.target.value })}
+                                  onBlur={(e) => {
+                                    const next = formatAmountOnBlur(e.target.value);
+                                    if (next !== deduction.amount) setDeduction({ ...deduction, amount: next });
+                                  }}
                                   required
                                 />
                                 <button

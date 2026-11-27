@@ -12,6 +12,7 @@ import { allowedPayableStatusIdsForRow, StatusChangeModal } from '../components/
 import { useAssignees, useLedgerStatuses, useSourceAccounts } from '../hooks';
 import { isReserveStatus, useLedger } from '../ledger';
 import { addDays, formatDate, formatMoney, WEEKDAYS } from '../format';
+import type { PdcStatusPayload } from '../lib/pdc';
 
 type Item = UpcomingRelease['items'][number];
 
@@ -204,6 +205,7 @@ export default function UpcomingReleasePage() {
       source_account_id?: number | null;
       assigned_to?: number | null;
       custom_field_values?: Record<string, string>;
+      pdc?: PdcStatusPayload;
     }) =>
       api.patch(`${ledger.apiBase}/${payload.id}/status`, {
         status_id: payload.statusId,
@@ -216,6 +218,7 @@ export default function UpcomingReleasePage() {
         ...(payload.custom_field_values && Object.keys(payload.custom_field_values).length
           ? { custom_field_values: payload.custom_field_values }
           : {}),
+        ...payload.pdc,
       }),
     onSuccess: (_res, vars) => {
       setMessage(`#${vars.id} set to status updated.`);
@@ -794,6 +797,7 @@ export default function UpcomingReleasePage() {
             source_account_id,
             assigned_to,
             custom_field_values,
+            pdc,
           }) => {
             setError(null);
             if (payment_reference) {
@@ -810,6 +814,7 @@ export default function UpcomingReleasePage() {
               source_account_id,
               assigned_to,
               custom_field_values,
+              pdc,
             });
           }}
         />

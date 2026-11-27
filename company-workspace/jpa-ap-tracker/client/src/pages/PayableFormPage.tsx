@@ -25,8 +25,25 @@ import { allowedPayableStatusIdsForRow } from '../components/StatusChangeModal';
 import { StatusHistoryPanel } from '../components/StatusHistoryPanel';
 import { WorkflowStepper } from '../components/WorkflowStepper';
 import { PdcSchedulePanel } from '../components/PdcSchedulePanel';
-import { addDays, formatAmountPlain, formatMoney } from '../format';
-import { isPdcPaymentMethodName, newPdcLine, sumPdcAmounts, type PdcLineDraft } from '../lib/pdc';
+import { SharedPdcModal, SharedPdcSummary } from '../components/SharedPdcModal';
+import { addDays, formatAmountOnBlur, formatAmountPlain, formatMoney } from '../format';
+import {
+  endLoneSharedPdcs,
+  invoicePdcForSeparateBatchCreate,
+  invoicePdcPayload,
+  isPdcPaymentMethodName,
+  newSharedPdcKey,
+  onePdcForAllBatchProblem,
+  pdcLinesFromApi,
+  pdcScheduleProblem,
+  setSharedPdcMembers,
+  sharedPdcsFromApi,
+  sharedPdcsPayload,
+  type BatchSharedPdcDraft,
+  type PdcLineDraft,
+  type SeparateBatchPdcMode,
+  type SharedPdcDrafts,
+} from '../lib/pdc';
 import { isReserveStatus, useLedger } from '../ledger';
 import { computeTaxAmounts, DEFAULT_VAT_RATE, EWT_RATES, moneyString, parseGross, roundMoney } from '../tax';
 import { isFuelType } from '../components/FuelDetails';
@@ -36,12 +53,17 @@ const ACCEPT = 'image/jpeg,image/png,image/webp,application/pdf';
 
 interface InvoiceDraft {
   key: string;
+  /** Stored invoice id on edit; the server keys kept PDC lines on it. */
+  id?: number;
   invoice_no: string;
   invoice_date: string;
   due_date: string;
   /** Empty string = no term (manual due). Number string = selected term id. */
   payment_term_id: string;
   gross_amount: string;
+  pdc_lines: PdcLineDraft[];
+  /** Key into the form's shared PDCs when one check pays this invoice with others. */
+  pdc_group: string | null;
 }
 
 function splitAmounts(total: number, n: number): string[] {
@@ -106,21 +128,26 @@ function newInvoice(partial?: Partial<InvoiceDraft>): InvoiceDraft {
     due_date: '',
     payment_term_id: '',
     gross_amount: '',
+    pdc_lines: [],
+    pdc_group: null,
     ...partial,
   };
 }
 
-function fromPayable(p: Payable): { form: FormState; invoices: InvoiceDraft[] } {
+function fromPayable(p: Payable): { form: FormState; invoices: InvoiceDraft[]; sharedPdcs: SharedPdcDrafts } {
   const termDefault = p.payment_term_id ? String(p.payment_term_id) : '';
   const lines =
     p.invoices && p.invoices.length > 0
       ? p.invoices.map((inv: PayableInvoice) =>
           newInvoice({
+            id: inv.id,
             invoice_no: inv.invoice_no ?? '',
             invoice_date: inv.invoice_date ?? '',
             due_date: inv.due_date ?? '',
             payment_term_id: inv.payment_term_id ? String(inv.payment_term_id) : '',
-            gross_amount: inv.gross_amount,
+            gross_amount: inv.gross_amount ? formatAmountPlain(inv.gross_amount) : '',
+            pdc_lines: pdcLinesFromApi(inv.pdc_lines),
+            pdc_group: inv.pdc_group ?? null,
           }),
         )
       : [
@@ -129,7 +156,7 @@ function fromPayable(p: Payable): { form: FormState; invoices: InvoiceDraft[] } 
             invoice_date: p.invoice_date ?? '',
             due_date: p.due_date,
             payment_term_id: termDefault,
-            gross_amount: p.gross_amount ?? p.amount,
+            gross_amount: formatAmountPlain(p.gross_amount ?? p.amount),
           }),
         ];
 
@@ -157,6 +184,7 @@ function fromPayable(p: Payable): { form: FormState; invoices: InvoiceDraft[] } 
       fuel_delivery_receipt: p.fuel_delivery_receipt ?? '',
     },
     invoices: lines,
+    sharedPdcs: sharedPdcsFromApi(p.pdc_groups),
   };
 }
 
@@ -216,14 +244,22 @@ export default function PayableFormPage() {
     queryKey: ['ledger', ledger.kind, 'detail', Number(id)],
     queryFn: () => api.get<Payable>(`${ledger.apiBase}/${id}`),
     enabled: isEdit,
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   const [form, setForm] = useState<FormState>(EMPTY);
   const [invoices, setInvoices] = useState<InvoiceDraft[]>([newInvoice()]);
+  /** Check no./date of each shared PDC an invoice's `pdc_group` names; loaded with the invoices. */
+  const [sharedPdcs, setSharedPdcs] = useState<SharedPdcDrafts>({});
+  /** Shared PDC open in the modal, and the invoice row it was opened from. */
+  const [sharedPdcEditor, setSharedPdcEditor] = useState<{ group: string; originKey: string } | null>(null);
   /** Create only: total amount before optional equal split into N payables. */
   const [headerAmount, setHeaderAmount] = useState('');
   const [splitSeparate, setSplitSeparate] = useState(false);
   const [splitCount, setSplitCount] = useState(2);
+  const [separatePdcMode, setSeparatePdcMode] = useState<SeparateBatchPdcMode>('per-invoice');
+  const [batchSharedPdc, setBatchSharedPdc] = useState<BatchSharedPdcDraft>({ pdc_no: '', pdc_date: '' });
   /** Shared uploads (one payable / edit). */
   const [files, setFiles] = useState<File[]>([]);
   /** Per-invoice uploads when creating several separate payable rows. */
@@ -232,25 +268,22 @@ export default function PayableFormPage() {
   const [error, setError] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<ConfirmRequest | null>(null);
   const [initialStatusId, setInitialStatusId] = useState<string>('');
-  const [pdcLines, setPdcLines] = useState<PdcLineDraft[]>([]);
 
   useEffect(() => {
     if (existing.data) {
       const loaded = fromPayable(existing.data);
       setForm(loaded.form);
       setInvoices(loaded.invoices);
-      setHeaderAmount(loaded.invoices[0]?.gross_amount ?? existing.data.gross_amount ?? '');
+      setSharedPdcs(loaded.sharedPdcs);
+      const batch = existing.data.shared_pdc_batch;
+      if (batch) {
+        setBatchSharedPdc({ pdc_no: batch.pdc_no ?? '', pdc_date: batch.pdc_date ?? '' });
+        setSeparatePdcMode('one-for-all');
+      }
+      const hdr = loaded.invoices[0]?.gross_amount ?? existing.data.gross_amount ?? '';
+      setHeaderAmount(hdr ? formatAmountPlain(hdr) : '');
       setSplitSeparate(false);
       setInitialStatusId(loaded.form.status_id);
-      setPdcLines(
-        existing.data.pdc_lines?.map((line) =>
-          newPdcLine({
-            pdc_no: line.pdc_no ?? '',
-            pdc_date: line.pdc_date ?? '',
-            amount: line.amount,
-          }),
-        ) ?? [],
-      );
     }
   }, [existing.data]);
 
@@ -363,8 +396,20 @@ export default function PayableFormPage() {
     () => lineTotals(invoices, form.apply_vat, vatRate, form.apply_ewt, form.ewt_kind),
     [invoices, form.apply_vat, vatRate, form.apply_ewt, form.ewt_kind],
   );
-  const needsPdcSchedule = isPayable && isPdcPaymentMethodName(method?.name);
-  const payableNet = Number(totals.net || headerAmount || existing.data?.amount || 0);
+  const isPdcMethod = isPayable && isPdcPaymentMethodName(method?.name);
+  const linkedSharedBatch = isEdit && Boolean(existing.data?.shared_pdc_batch);
+  const linkedBatchMembers = existing.data?.shared_pdc_batch?.members ?? [];
+  const separateBatchPdc = isPdcMethod && !isEdit && splitSeparate && invoices.length > 1;
+  const showPerInvoicePdc = isPdcMethod && (!separateBatchPdc || separatePdcMode === 'per-invoice') && !linkedSharedBatch;
+  const netByKey = useMemo(() => new Map(totals.rows.map((row) => [row.key, row.netAmount])), [totals.rows]);
+  const linkedBatchTotal = useMemo(() => {
+    if (!linkedSharedBatch) return null;
+    const selfNet = totals.rows[0]?.netAmount ?? 0;
+    return linkedBatchMembers.reduce(
+      (acc, m) => acc + (m.payable_id === Number(id) ? selfNet : Number(m.net)),
+      0,
+    );
+  }, [linkedSharedBatch, linkedBatchMembers, totals.rows, id]);
 
   const previews = useMemo(
     () => files.map((f) => ({ file: f, url: f.type.startsWith('image/') ? URL.createObjectURL(f) : null })),
@@ -422,15 +467,25 @@ export default function PayableFormPage() {
   };
 
   const buildInvoicePayload = () =>
-    invoices.map((inv, index) => {
+    totals.rows.map((row, index) => {
+      const inv = invoices.find((i) => i.key === row.key)!;
       const hasTerm = Boolean(inv.payment_term_id);
       const gross = isFuel && index === 0 && fuelTotal ? fuelTotal : inv.gross_amount.replace(/,/g, '');
+      const pdcFields = isPdcMethod
+        ? linkedSharedBatch || (separateBatchPdc && separatePdcMode === 'one-for-all')
+          ? invoicePdcForSeparateBatchCreate(inv, 'one-for-all', batchSharedPdc, row.netAmount)
+          : separateBatchPdc
+            ? invoicePdcForSeparateBatchCreate(inv, separatePdcMode, batchSharedPdc, row.netAmount)
+            : invoicePdcPayload(inv)
+        : {};
       return {
+        id: inv.id,
         invoice_no: inv.invoice_no || null,
         invoice_date: inv.invoice_date || null,
         payment_term_id: inv.payment_term_id ? Number(inv.payment_term_id) : null,
         due_date: hasTerm ? null : inv.due_date || null,
         gross_amount: gross,
+        ...pdcFields,
       };
     });
 
@@ -463,6 +518,18 @@ export default function PayableFormPage() {
       }
       if (isPayable && !isDraft && isPaidLike && !form.check_date) {
         throw new Error('Check date is required when submitting a deposited/paid payable');
+      }
+      if (isPdcMethod && !isDraft) {
+        if (linkedSharedBatch || (separateBatchPdc && separatePdcMode === 'one-for-all')) {
+          const sharedProblem = onePdcForAllBatchProblem(batchSharedPdc);
+          if (sharedProblem) throw new Error(sharedProblem);
+        } else {
+          for (const [i, row] of totals.rows.entries()) {
+            if (row.pdc_group) continue;
+            const problem = pdcScheduleProblem(row.pdc_lines, row.netAmount);
+            if (problem) throw new Error(`Invoice ${i + 1}${row.invoice_no ? ` (${row.invoice_no})` : ''}: ${problem}`);
+          }
+        }
       }
 
       const shared = {
@@ -537,31 +604,18 @@ export default function PayableFormPage() {
                 ? { ...inv, gross_amount: headerAmount || inv.gross_amount }
                 : inv,
             ),
-        ...(isPayable && needsPdcSchedule && !isDraft
+        ...(linkedSharedBatch
           ? {
-              pdc_lines: pdcLines.map((line) => ({
-                pdc_no: line.pdc_no.trim() || null,
-                pdc_date: line.pdc_date || null,
-                amount: line.amount.replace(/,/g, ''),
-              })),
+              shared_pdc_batch: {
+                pdc_no: batchSharedPdc.pdc_no.trim() || null,
+                pdc_date: batchSharedPdc.pdc_date || null,
+              },
             }
-          : isPayable && pdcLines.length
-            ? {
-                pdc_lines: pdcLines.map((line) => ({
-                  pdc_no: line.pdc_no.trim() || null,
-                  pdc_date: line.pdc_date || null,
-                  amount: line.amount.replace(/,/g, ''),
-                })),
-              }
+          : isPdcMethod
+            ? { pdc_groups: sharedPdcsPayload(invoices, sharedPdcs) }
             : {}),
       };
 
-      if (isPayable && needsPdcSchedule && !isDraft) {
-        if (!pdcLines.length) throw new Error('Add at least one PDC line.');
-        if (Math.abs(sumPdcAmounts(pdcLines) - payableNet) > 0.01) {
-          throw new Error('PDC scheduled total must equal the payable net amount.');
-        }
-      }
       const saved = isEdit ? await api.put<Payable>(`${ledger.apiBase}/${id}`, body) : await api.post<Payable>(ledger.apiBase, body);
       try {
         await uploadFiles(saved.id, files);
@@ -570,9 +624,12 @@ export default function PayableFormPage() {
       }
       return saved;
     },
-    onSuccess: () => {
+    onSuccess: (_data, isDraft) => {
       qc.invalidateQueries({ queryKey: ['ledger', ledger.kind] });
       qc.invalidateQueries({ queryKey: ['upcoming', ledger.kind] });
+      if (isEdit && id) {
+        qc.invalidateQueries({ queryKey: ['ledger', ledger.kind, 'detail', Number(id)] });
+      }
       navigate(ledger.listPath);
     },
     onError: (e) => setError(errorMessage(e)),
@@ -618,6 +675,14 @@ export default function PayableFormPage() {
         )
       : null;
   const showStatusPicker = !isPayable || isEdit || auth.isAdmin;
+  const canSharePdc = isPdcMethod && canEditDoc && invoices.length > 1 && !(!isEdit && splitSeparate) && !linkedSharedBatch;
+  const invoiceLabel = (key: string) => {
+    const index = invoices.findIndex((inv) => inv.key === key);
+    const no = invoices[index]?.invoice_no;
+    return `Invoice ${index + 1}${no ? ` (${no})` : ''}`;
+  };
+  const moveToSharedPdc = (group: string, members: Set<string>) =>
+    setInvoices((rows) => setSharedPdcMembers(rows, group, members, sharedPdcs, netByKey));
 
   return (
     <section className="paper-form-page w-full min-w-0">
@@ -744,6 +809,10 @@ export default function PayableFormPage() {
                   placeholder="0.0000"
                   value={form.fuel_price_per_liter}
                   onChange={(e) => set('fuel_price_per_liter', e.target.value)}
+                  onBlur={(e) => {
+                    const next = formatAmountOnBlur(e.target.value);
+                    if (next !== form.fuel_price_per_liter) set('fuel_price_per_liter', next);
+                  }}
                 />
               </label>
               <label className="field">
@@ -1061,8 +1130,8 @@ export default function PayableFormPage() {
                     else setInvoices((rows) => [{ ...rows[0]!, gross_amount: next }]);
                   }}
                   onBlur={(e) => {
-                    const preview = formatAmountPlain(e.target.value);
-                    if (preview && e.target.value.trim()) setHeaderAmount(preview.replace(/,/g, ''));
+                    const next = formatAmountOnBlur(e.target.value);
+                    if (next !== e.target.value) setHeaderAmount(next);
                   }}
                 />
                 {headerAmount && (
@@ -1120,6 +1189,91 @@ export default function PayableFormPage() {
                   <span className="hint">Amount is divided equally across {splitCount} payables</span>
                 </label>
               )}
+              {separateBatchPdc && (
+                <fieldset className="field span-all" style={{ border: 'none', padding: 0, margin: 0 }}>
+                  <legend className="field-label">PDC for separate payables</legend>
+                  <label className="checkbox">
+                    <input
+                      type="radio"
+                      name="separatePdcMode"
+                      checked={separatePdcMode === 'per-invoice'}
+                      onChange={() => setSeparatePdcMode('per-invoice')}
+                    />
+                    PDC per invoice
+                  </label>
+                  <label className="checkbox">
+                    <input
+                      type="radio"
+                      name="separatePdcMode"
+                      checked={separatePdcMode === 'one-for-all'}
+                      onChange={() => setSeparatePdcMode('one-for-all')}
+                    />
+                    One PDC for all invoices
+                  </label>
+                </fieldset>
+              )}
+            </div>
+          )}
+
+          {(linkedSharedBatch || (separateBatchPdc && separatePdcMode === 'one-for-all')) && (
+            <div className="span-all batch-shared-pdc entry-sheet-grid" style={{ marginBottom: '0.75rem' }}>
+              <div className="field-label span-all">Shared post-dated check</div>
+              <p className="muted small span-all">
+                {linkedSharedBatch
+                  ? 'One check covers all linked payables below. Editing check no./date updates every sibling.'
+                  : `One check covers all ${invoices.length} payables. Each payable stores its share of this check for its invoice net (${formatMoney(totals.net)} total).`}
+              </p>
+              {linkedSharedBatch && linkedBatchMembers.length > 0 && (
+                <ul className="muted small span-all" style={{ margin: 0, paddingLeft: '1.25rem' }}>
+                  {linkedBatchMembers.map((m) => (
+                    <li key={m.payable_id}>
+                      {m.payable_id === Number(id) ? (
+                        <>
+                          This payable{m.invoice_no ? ` (${m.invoice_no})` : ''} — net <strong>{formatMoney(m.net)}</strong>
+                        </>
+                      ) : (
+                        <>
+                          <Link to={`/payables/${m.payable_id}`}>Payable #{m.payable_id}</Link>
+                          {m.invoice_no ? ` (${m.invoice_no})` : ''} — net {formatMoney(m.net)}
+                        </>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <label className="field">
+                <span className="field-label">PDC no. *</span>
+                <input
+                  required={!draftActions}
+                  value={batchSharedPdc.pdc_no}
+                  onChange={(e) => setBatchSharedPdc((prev) => ({ ...prev, pdc_no: e.target.value }))}
+                />
+              </label>
+              <label className="field">
+                <span className="field-label">PDC date *</span>
+                <input
+                  type="date"
+                  required={!draftActions}
+                  value={batchSharedPdc.pdc_date}
+                  onChange={(e) => setBatchSharedPdc((prev) => ({ ...prev, pdc_date: e.target.value }))}
+                />
+              </label>
+              <label className="field">
+                <span className="field-label">Check amount (PHP)</span>
+                <input
+                  readOnly
+                  value={
+                    linkedSharedBatch
+                      ? linkedBatchTotal != null && linkedBatchTotal > 0
+                        ? formatAmountPlain(linkedBatchTotal)
+                        : ''
+                      : Number(totals.net) > 0
+                        ? formatAmountPlain(Number(totals.net))
+                        : ''
+                  }
+                />
+                <span className="hint">Sum of all linked payable nets</span>
+              </label>
             </div>
           )}
 
@@ -1128,6 +1282,8 @@ export default function PayableFormPage() {
               const draft = invoices.find((i) => i.key === row.key)!;
               const rowTerm = termForInvoice(draft);
               const dueValue = dueForInvoice(draft);
+              const group = draft.pdc_group;
+              const sharedKeys = group ? invoices.filter((inv) => inv.pdc_group === group).map((inv) => inv.key) : [];
               return (
                 <div key={row.key} className="invoice-row paper-invoice-row w-full min-w-0 gap-3">
                   <div className="invoice-row-title">Invoice {index + 1}</div>
@@ -1193,7 +1349,7 @@ export default function PayableFormPage() {
                   ) : !isEdit && (splitSeparate || index === 0) ? (
                     <label className="field">
                       <span className="field-label">Gross amount (PHP)</span>
-                      <input readOnly value={row.gross_amount} />
+                      <input readOnly value={formatAmountPlain(row.gross_amount) || row.gross_amount} />
                       <span className="hint">
                         {splitSeparate ? 'From equal split of the amount above' : 'From amount above'}
                       </span>
@@ -1207,6 +1363,10 @@ export default function PayableFormPage() {
                         placeholder="0.00"
                         value={row.gross_amount}
                         onChange={(e) => setInvoice(row.key, { gross_amount: e.target.value })}
+                        onBlur={(e) => {
+                          const next = formatAmountOnBlur(e.target.value);
+                          if (next !== row.gross_amount) setInvoice(row.key, { gross_amount: next });
+                        }}
                       />
                     </label>
                   )}
@@ -1220,6 +1380,40 @@ export default function PayableFormPage() {
                       'Enter gross amount'
                     )}
                   </div>
+                  {isPdcMethod && group ? (
+                    <SharedPdcSummary
+                      check={sharedPdcs[group]}
+                      amount={sharedKeys.reduce((sum, key) => sum + (netByKey.get(key) ?? 0), 0)}
+                      invoiceLabels={sharedKeys.map(invoiceLabel)}
+                      onEdit={canEditDoc ? () => setSharedPdcEditor({ group, originKey: row.key }) : undefined}
+                      onLeave={
+                        canEditDoc
+                          ? () => moveToSharedPdc(group, new Set(sharedKeys.filter((key) => key !== row.key)))
+                          : undefined
+                      }
+                    />
+                  ) : showPerInvoicePdc ? (
+                    <>
+                      <PdcSchedulePanel
+                        lines={draft.pdc_lines}
+                        onChange={(pdc_lines) => setInvoice(row.key, { pdc_lines })}
+                        netAmount={row.netAmount}
+                        readOnly={!canEditDoc}
+                        describedById={`pdc-total-${row.key}`}
+                      />
+                      {canSharePdc && (
+                        <div className="invoice-pdc">
+                          <button
+                            type="button"
+                            className="btn ghost small"
+                            onClick={() => setSharedPdcEditor({ group: newSharedPdcKey(), originKey: row.key })}
+                          >
+                            Share one PDC with other invoices…
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : null}
                   {perInvoiceUploads && (
                     <div className="invoice-upload">
                       <div className="field-label">Invoice file (image or PDF, max {MAX_MB} MB)</div>
@@ -1276,7 +1470,13 @@ export default function PayableFormPage() {
                       type="button"
                       className="btn small danger"
                       onClick={() => {
-                        setInvoices((rows) => rows.filter((r) => r.key !== row.key));
+                        setInvoices((rows) =>
+                          endLoneSharedPdcs(
+                            rows.filter((r) => r.key !== row.key),
+                            sharedPdcs,
+                            netByKey,
+                          ),
+                        );
                         setInvoiceFiles((prev) => {
                           const next = { ...prev };
                           delete next[row.key];
@@ -1309,15 +1509,6 @@ export default function PayableFormPage() {
               Total net: <strong>{formatMoney(totals.net)}</strong>
             </span>
           </div>
-
-          {needsPdcSchedule && (
-            <PdcSchedulePanel
-              lines={pdcLines}
-              onChange={setPdcLines}
-              netAmount={payableNet}
-              readOnly={!canEditDoc}
-            />
-          )}
         </div>
 
         <label className="field span-all">
@@ -1430,6 +1621,31 @@ export default function PayableFormPage() {
           </div>
         </div>
       </form>
+      {sharedPdcEditor && (
+        <SharedPdcModal
+          group={sharedPdcEditor.group}
+          originKey={sharedPdcEditor.originKey}
+          sharedPdcs={sharedPdcs}
+          invoices={totals.rows.map((row) => ({
+            key: row.key,
+            label: invoiceLabel(row.key),
+            net: row.netAmount,
+            pdc_group: row.pdc_group,
+            ownLineCount: row.pdc_lines.length,
+          }))}
+          onApply={(check, members) => {
+            const nextSharedPdcs = { ...sharedPdcs, [sharedPdcEditor.group]: check };
+            setSharedPdcs(nextSharedPdcs);
+            setInvoices((rows) => setSharedPdcMembers(rows, sharedPdcEditor.group, members, nextSharedPdcs, netByKey));
+            setSharedPdcEditor(null);
+          }}
+          onEnd={() => {
+            moveToSharedPdc(sharedPdcEditor.group, new Set());
+            setSharedPdcEditor(null);
+          }}
+          onClose={() => setSharedPdcEditor(null)}
+        />
+      )}
       <ConfirmDialog
         request={confirm}
         pending={removeAttachment.isPending}

@@ -39,10 +39,26 @@ import {
 import { notifyAssignee } from '../lib/notifications';
 import { syncDocumentFunds, undoDocumentFunds } from '../lib/sourceAccounts';
 import {
-  assertPayablePdcSchedule,
-  listPayablePdcLines,
-  replacePayablePdcLines,
+  isPdcPaymentMethod,
+  loadPayablePdc,
+  resolveInvoicePdc,
+  savePdcPlan,
+  sharedPdcFields,
+  storedCoverage,
+  writePayablePdc,
+  type StoredPdc,
 } from '../lib/payablePdc';
+import {
+  assertSharedBatchPutAllowed,
+  createSharedPdcBatch,
+  detectCrossPayableSharedPdc,
+  getPayableSharedBatchId,
+  linkPayablesToSharedBatch,
+  loadSharedPdcBatch,
+  resolveSharedBatchFieldsFromPut,
+  syncSharedBatchPdcLines,
+  updateSharedPdcBatchFields,
+} from '../lib/payableSharedPdcBatch';
 
 
 export function documentSelect(spec: LedgerSpec) {
@@ -52,7 +68,8 @@ export function documentSelect(spec: LedgerSpec) {
          (SELECT COALESCE(jsonb_object_agg(psfv.custom_field_id::text, to_jsonb(psfv.value)), '{}'::jsonb)
             FROM payable_status_field_values psfv
            WHERE psfv.payable_id = p.id) AS status_field_values,
-         (SELECT count(*)::int FROM payable_pdc_lines pl WHERE pl.payable_id = p.id) AS pdc_count`
+         (SELECT count(*)::int FROM payable_pdc_lines pl WHERE pl.payable_id = p.id)
+           + (SELECT count(*)::int FROM payable_pdc_groups pg WHERE pg.payable_id = p.id) AS pdc_count`
       : '';
   return `
   SELECT p.*,
@@ -686,13 +703,19 @@ async function applyFuelAmounts<T extends PayableInput | PayableBatchInput>(db: 
   return { ...input, gross_amount: total } as T;
 }
 
-async function replaceInvoices(db: Queryable, payableId: number, invoices: ComputedInvoice[]) {
+async function replaceInvoices(
+  db: Queryable,
+  payableId: number,
+  invoices: ComputedInvoice[],
+): Promise<(ComputedInvoice & { id: number })[]> {
   await db.query(`DELETE FROM ${spec.invoices} WHERE ${spec.parentFk} = $1`, [payableId]);
+  const saved: (ComputedInvoice & { id: number })[] = [];
   for (const inv of invoices) {
-    await db.query(
+    const { rows } = await db.query<{ id: number }>(
       `INSERT INTO ${spec.invoices}
          (${spec.parentFk}, invoice_no, invoice_date, payment_term_id, due_date, gross_amount, vat_amount, ewt_amount, net_amount, sort_order)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       RETURNING id`,
       [
         payableId,
         inv.invoice_no,
@@ -706,11 +729,32 @@ async function replaceInvoices(db: Queryable, payableId: number, invoices: Compu
         inv.sort_order,
       ],
     );
+    saved.push({ ...inv, id: rows[0].id });
   }
+  return saved;
+}
+
+/**
+ * Writes PDC coverage for invoices just saved by `replaceInvoices`, which gave them new ids. Each invoice
+ * resolves against the coverage stored under the `id` the client echoed, read before the rewrite.
+ */
+async function savePayablePdc(
+  db: Queryable,
+  payableId: number,
+  input: Pick<PayableInput, 'payment_method_id' | 'is_draft' | 'invoices' | 'pdc_groups'>,
+  saved: { id: number; invoice_no: string | null; net_amount: string }[],
+  stored: StoredPdc | null,
+) {
+  if (!(await isPdcPaymentMethod(db, input.payment_method_id))) return savePdcPlan(db, payableId, [], null);
+  const coverage = saved.map((_, i) => {
+    const sent = input.invoices?.[i];
+    return resolveInvoicePdc(sent, storedCoverage(stored, sent?.id));
+  });
+  await writePayablePdc(db, payableId, saved, coverage, sharedPdcFields(stored, input.pdc_groups), !input.is_draft);
 }
 
 async function fetchInvoices(db: Queryable, payableId: number) {
-  const { rows } = await db.query(
+  const { rows } = await db.query<{ id: number; invoice_no: string | null; net_amount: string }>(
     `SELECT id, invoice_no, invoice_date, gross_amount::text, vat_amount::text, ewt_amount::text,
             net_amount::text, payment_term_id, due_date, sort_order
        FROM ${spec.invoices} WHERE ${spec.parentFk} = $1 ORDER BY sort_order, id`,
@@ -722,16 +766,28 @@ async function fetchInvoices(db: Queryable, payableId: number) {
 async function fetchPayable(db: Queryable, id: number) {
   const { rows } = await db.query(`${PAYABLE_SELECT} WHERE p.id = $1`, [id]);
   if (!rows[0]) throw notFound(spec.noun);
-  const [attachments, invoices, pdcLines] = await Promise.all([
+  const [attachments, invoices, pdc] = await Promise.all([
     db.query(`SELECT id, original_name, mime, size, created_at FROM attachments WHERE ${spec.parentFk} = $1 ORDER BY id`, [id]),
     fetchInvoices(db, id),
-    spec.kind === 'payable' ? listPayablePdcLines(db, id) : Promise.resolve([]),
+    spec.kind === 'payable' ? loadPayablePdc(db, id) : Promise.resolve(null),
   ]);
+  const sharedBatchId =
+    spec.kind === 'payable' ? ((rows[0] as { shared_pdc_batch_id?: number | null }).shared_pdc_batch_id ?? null) : null;
+  const shared_pdc_batch =
+    spec.kind === 'payable' && sharedBatchId ? await loadSharedPdcBatch(db, sharedBatchId) : undefined;
+  if (!pdc) {
+    return { ...rows[0], attachments: attachments.rows, invoices, ...(shared_pdc_batch ? { shared_pdc_batch } : {}) };
+  }
   return {
     ...rows[0],
     attachments: attachments.rows,
-    invoices,
-    pdc_lines: spec.kind === 'payable' ? pdcLines : undefined,
+    invoices: invoices.map((inv) => ({
+      ...inv,
+      pdc_lines: pdc.linesByInvoice.get(inv.id) ?? [],
+      pdc_group: pdc.groupByInvoice.get(inv.id) ?? null,
+    })),
+    pdc_groups: pdc.groups,
+    ...(shared_pdc_batch ? { shared_pdc_batch } : {}),
   };
 }
 
@@ -839,7 +895,8 @@ router.get('/:id', requirePermission(`${spec.document}_view`), async (req, res) 
 router.post('/batch', requirePermission(`${spec.document}_create`), async (req, res) => {
   const input = payableBatchSchema.parse(req.body);
   const result = await withTransaction(async (db) => {
-    const created = [];
+    const created: Awaited<ReturnType<typeof fetchPayable>>[] = [];
+    const createdIds: number[] = [];
     const today = await todayForApp(db);
     for (const line of input.invoices) {
       const createStatus = await resolveCreateStatus(db, input.status_id, input.is_draft, req.user!);
@@ -876,7 +933,17 @@ router.post('/batch', requirePermission(`${spec.document}_create`), async (req, 
         values,
       );
       const payableId = rows[0].id as number;
-      await replaceInvoices(db, payableId, data.invoices);
+      const savedInvoices = await replaceInvoices(db, payableId, data.invoices);
+      if (spec.kind === 'payable') {
+        // `data.invoices` are computed rows without PDC fields; `fueled.invoices` is the single parsed line.
+        await savePayablePdc(
+          db,
+          payableId,
+          { payment_method_id: fueled.payment_method_id, is_draft: input.is_draft, invoices: fueled.invoices },
+          savedInvoices,
+          null,
+        );
+      }
       await insertStatusHistory(db, {
         payableId,
         fromStatusId: null,
@@ -905,7 +972,19 @@ router.post('/batch', requirePermission(`${spec.document}_create`), async (req, 
           db,
         });
       }
+      createdIds.push(payableId);
       created.push(await fetchPayable(db, payableId));
+    }
+    if (spec.kind === 'payable') {
+      const sharedCheck = detectCrossPayableSharedPdc(input.invoices);
+      if (sharedCheck) {
+        const batchId = await createSharedPdcBatch(db, sharedCheck);
+        await linkPayablesToSharedBatch(db, batchId, createdIds);
+        await syncSharedBatchPdcLines(db, batchId, !input.is_draft);
+        for (let i = 0; i < createdIds.length; i++) {
+          created[i] = await fetchPayable(db, createdIds[i]);
+        }
+      }
     }
     return created;
   });
@@ -944,12 +1023,9 @@ router.post('/', requirePermission(`${spec.document}_create`), async (req, res) 
       values,
     );
     const payableId = rows[0].id as number;
-    await replaceInvoices(db, payableId, data.invoices);
-    if (spec.kind === 'payable' && !input.is_draft) {
-      await assertPayablePdcSchedule(db, input.payment_method_id, data.amount, input.pdc_lines);
-      await replacePayablePdcLines(db, payableId, input.pdc_lines);
-    } else if (spec.kind === 'payable' && input.pdc_lines?.length) {
-      await replacePayablePdcLines(db, payableId, input.pdc_lines);
+    const savedInvoices = await replaceInvoices(db, payableId, data.invoices);
+    if (spec.kind === 'payable') {
+      await savePayablePdc(db, payableId, input, savedInvoices, null);
     }
     await insertStatusHistory(db, {
       payableId,
@@ -998,7 +1074,8 @@ router.put('/:id', requirePermission(`${spec.document}_edit`), async (req, res) 
         source_account_id: number | null;
       }
     >(
-      `SELECT client_id, payment_term_id, status_id, assigned_to, is_draft, created_by, check_date, source_account_id
+      `SELECT client_id, payment_term_id, status_id, assigned_to, is_draft, created_by, check_date, source_account_id,
+              shared_pdc_batch_id
          FROM ${spec.document} WHERE id = $1 FOR UPDATE`,
       [id],
     );
@@ -1025,7 +1102,8 @@ router.put('/:id', requirePermission(`${spec.document}_edit`), async (req, res) 
     const statusChanged = data.status_id !== existing.status_id;
     let putWorkflowStatus = null as Awaited<ReturnType<typeof getPayableStatusWorkflow>> | null;
     let putCustomValues: Record<number, string> = {};
-    if (statusChanged) {
+    const isDraftSubmit = existing.is_draft && !input.is_draft;
+    if (statusChanged && !isDraftSubmit) {
       assertCanChangeAssignedStatus(req.user!, existing.assigned_to, spec.noun);
       await assertCanSetPayableStatus(db, req.user!, data.status_id, spec.kind);
       if (spec.kind === 'payable') await assertCheckDateForPaid(toStatus, input.check_date ?? existing.check_date);
@@ -1087,13 +1165,20 @@ router.put('/:id', requirePermission(`${spec.document}_edit`), async (req, res) 
       id,
     ]);
     if (!rowCount) throw notFound(spec.noun);
-    await replaceInvoices(db, id, data.invoices);
+    const sharedBatchId =
+      spec.kind === 'payable' ? ((existing as { shared_pdc_batch_id?: number | null }).shared_pdc_batch_id ?? null) : null;
+    if (spec.kind === 'payable' && sharedBatchId) {
+      assertSharedBatchPutAllowed(sharedBatchId, input);
+    }
+    const storedPdc = spec.kind === 'payable' ? await loadPayablePdc(db, id) : null;
+    const savedInvoices = await replaceInvoices(db, id, data.invoices);
     if (spec.kind === 'payable') {
-      if (!input.is_draft) {
-        await assertPayablePdcSchedule(db, input.payment_method_id, data.amount, input.pdc_lines);
-      }
-      if (input.pdc_lines !== undefined) {
-        await replacePayablePdcLines(db, id, input.pdc_lines);
+      if (sharedBatchId) {
+        const fields = resolveSharedBatchFieldsFromPut(input);
+        if (fields) await updateSharedPdcBatchFields(db, sharedBatchId, fields);
+        await syncSharedBatchPdcLines(db, sharedBatchId, !input.is_draft);
+      } else {
+        await savePayablePdc(db, id, input, savedInvoices, storedPdc);
       }
     }
     if (statusChanged) {
@@ -1186,9 +1271,29 @@ router.patch('/:id/status', requirePermission(`${spec.document}_status`), async 
       await assertPayableStatusDestinationGates(db, id, workflowStatus, patchCustomValues);
     }
 
-    if (spec.kind === 'payable' && body.pdc_lines !== undefined) {
-      await assertPayablePdcSchedule(db, rows[0].payment_method_id, rows[0].amount, body.pdc_lines);
-      await replacePayablePdcLines(db, id, body.pdc_lines);
+    const sharedBatchId = spec.kind === 'payable' ? await getPayableSharedBatchId(db, id) : null;
+    if (
+      spec.kind === 'payable' &&
+      (body.invoices || body.pdc_groups || body.shared_pdc_batch) &&
+      (await isPdcPaymentMethod(db, rows[0].payment_method_id))
+    ) {
+      if (sharedBatchId) {
+        assertSharedBatchPutAllowed(sharedBatchId, body);
+        const fields = resolveSharedBatchFieldsFromPut(body);
+        if (fields) await updateSharedPdcBatchFields(db, sharedBatchId, fields);
+        await syncSharedBatchPdcLines(db, sharedBatchId, true);
+      } else {
+        const [invoices, stored] = await Promise.all([fetchInvoices(db, id), loadPayablePdc(db, id)]);
+        const sent = new Map((body.invoices ?? []).map((inv) => [inv.id, inv]));
+        const unknown = [...sent.keys()].filter((invoiceId) => !invoices.some((inv) => inv.id === invoiceId));
+        if (unknown.length) {
+          throw new HttpError(400, 'Validation failed', {
+            fieldErrors: { invoices: [`Invoice id(s) ${unknown.join(', ')} are not on this ${spec.noun}; reload and retry`] },
+          });
+        }
+        const coverage = invoices.map((inv) => resolveInvoicePdc(sent.get(inv.id), storedCoverage(stored, inv.id)));
+        await writePayablePdc(db, id, invoices, coverage, sharedPdcFields(stored, body.pdc_groups), true);
+      }
     }
 
     const patchSourceAccountId =

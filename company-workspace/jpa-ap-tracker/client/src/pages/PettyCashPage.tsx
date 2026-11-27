@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as XLSX from 'xlsx';
 import { api, errorMessage, qs } from '../api';
 import { ErrorBox, Modal } from '../components';
-import { formatMoney } from '../format';
+import { formatAmountOnBlur, formatMoney } from '../format';
 import { useAuth } from '../auth';
 
 interface Allowance {
@@ -196,6 +196,10 @@ export default function PettyCashPage() {
                   inputMode="decimal"
                   value={form.amount}
                   onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                  onBlur={(e) => {
+                    const next = formatAmountOnBlur(e.target.value);
+                    if (next !== form.amount) setForm({ ...form, amount: next });
+                  }}
                   required
                   placeholder="0.00"
                 />

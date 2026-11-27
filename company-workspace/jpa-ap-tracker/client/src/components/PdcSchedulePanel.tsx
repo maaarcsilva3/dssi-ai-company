@@ -1,31 +1,32 @@
-import { formatAmountPlain, formatMoney } from '../format';
-import { newPdcLine, sumPdcAmounts, type PdcLineDraft } from '../lib/pdc';
+import { formatAmountOnBlur, formatMoney } from '../format';
+import { isPdcBalanced, newPdcLine, sumPdcAmounts, type PdcLineDraft } from '../lib/pdc';
 
+/** Post-dated checks for one invoice; the footer compares their total with that invoice's net. */
 export function PdcSchedulePanel({
   lines,
   onChange,
   netAmount,
   readOnly,
-  describedById = 'pdc-schedule-total',
+  describedById,
 }: {
   lines: PdcLineDraft[];
   onChange: (lines: PdcLineDraft[]) => void;
   netAmount: number;
   readOnly?: boolean;
-  describedById?: string;
+  describedById: string;
 }) {
   const scheduled = sumPdcAmounts(lines);
-  const match = Math.abs(scheduled - netAmount) <= 0.01;
+  const match = isPdcBalanced(lines, netAmount);
 
   const setLine = (key: string, patch: Partial<PdcLineDraft>) => {
     onChange(lines.map((row) => (row.key === key ? { ...row, ...patch } : row)));
   };
 
   return (
-    <div className="form-section span-all">
-      <h2 className="form-section-title">PDC schedule</h2>
+    <div className="invoice-pdc">
+      <div className="field-label">PDC schedule</div>
       {!lines.length && !readOnly && (
-        <p className="muted small">Add post-dated check lines that sum to the payable net amount.</p>
+        <p className="muted small">Add post-dated check lines that sum to this invoice&apos;s net amount.</p>
       )}
       <div className="invoice-rows flex flex-col gap-2">
         {lines.map((line, index) => (
@@ -57,10 +58,8 @@ export function PdcSchedulePanel({
                 aria-describedby={describedById}
                 onChange={(e) => setLine(line.key, { amount: e.target.value })}
                 onBlur={(e) => {
-                  const preview = formatAmountPlain(e.target.value);
-                  if (preview && e.target.value.trim()) {
-                    setLine(line.key, { amount: preview.replace(/,/g, '') });
-                  }
+                  const next = formatAmountOnBlur(e.target.value);
+                  if (next !== line.amount) setLine(line.key, { amount: next });
                 }}
               />
             </label>
@@ -86,7 +85,7 @@ export function PdcSchedulePanel({
         className={match ? 'muted small' : 'tag-overdue small'}
         style={{ marginTop: '0.5rem' }}
       >
-        Scheduled total: {formatMoney(scheduled)} · Payable net: {formatMoney(netAmount)}
+        Scheduled total: {formatMoney(scheduled)} · Invoice net: {formatMoney(netAmount)}
         {!match && netAmount > 0 ? ' — amounts must match' : match && netAmount > 0 ? ' — balanced' : ''}
       </p>
     </div>

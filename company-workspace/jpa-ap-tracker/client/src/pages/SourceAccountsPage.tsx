@@ -12,7 +12,7 @@ import {
 import { useAuth } from '../auth';
 import { ConfirmDialog, ErrorBox, Modal, type ConfirmRequest } from '../components';
 import { useSourceAccounts, useSourceTransactions } from '../hooks';
-import { formatDate, formatMoney } from '../format';
+import { formatAmountOnBlur, formatDate, formatMoney } from '../format';
 
 export type SourceAccountsMode = 'accounts' | 'deposit' | 'withdrawal';
 
@@ -410,6 +410,12 @@ export default function SourceAccountsPage({ mode }: { mode: SourceAccountsMode 
                         onChange={(e) =>
                           setAccountForm((f) => ({ ...f, initial_deposit: e.target.value }))
                         }
+                        onBlur={(e) => {
+                          const next = formatAmountOnBlur(e.target.value);
+                          if (next !== accountForm.initial_deposit) {
+                            setAccountForm((f) => ({ ...f, initial_deposit: next }));
+                          }
+                        }}
                       />
                     </label>
                     <label>
@@ -514,6 +520,12 @@ export default function SourceAccountsPage({ mode }: { mode: SourceAccountsMode 
                     inputMode="decimal"
                     value={transferForm.amount}
                     onChange={(e) => setTransferForm((f) => ({ ...f, amount: e.target.value }))}
+                    onBlur={(e) => {
+                      const next = formatAmountOnBlur(e.target.value);
+                      if (next !== transferForm.amount) {
+                        setTransferForm((f) => ({ ...f, amount: next }));
+                      }
+                    }}
                   />
                 </label>
                 <label>
@@ -611,6 +623,10 @@ export default function SourceAccountsPage({ mode }: { mode: SourceAccountsMode 
                     inputMode="decimal"
                     value={txnForm.amount}
                     onChange={(e) => setTxnForm((f) => ({ ...f, amount: e.target.value }))}
+                    onBlur={(e) => {
+                      const next = formatAmountOnBlur(e.target.value);
+                      if (next !== txnForm.amount) setTxnForm((f) => ({ ...f, amount: next }));
+                    }}
                   />
                 </label>
                 <label>
