@@ -418,5 +418,45 @@
     "createdAt": "2026-11-27T02:52:27.570Z",
     "sessionId": "ses_da12d7c495941dced5c64fd1",
     "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwylg85o_6fatw5",
+    "role": "product-manager",
+    "title": "JPA AP/AR Tracker — PDF adjustment product brief",
+    "kind": "product-brief",
+    "body": "Full PDF must-have brief for JPA AP/AR Tracker. Path: company-workspace/jpa-ap-tracker/product-brief-pdf-adjustment.md. Scope: AP multi-invoice+PDCs, multi-invoice one check, Jeanette→Jea(admin)→Crissa→Jeanette status workflow with permission enforcement, comma amounts, AR due date/search/MM-DD-YYYY, invoice count+totals, monthly summary Excel, monthly sales report Excel. Out of scope: Telegram/AI/liquidations/petty cash/etc. ASSUMPTION: Jea=admin; Excel layouts from existing AR fields. Deadline today. CEO blockers: none.",
+    "createdAt": "2026-11-27T06:22:03.852Z",
+    "sessionId": "ses_704c2df902448eb48eb76eb2",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwylgadc_3zklvq",
+    "role": "designer",
+    "title": "JPA AP/AR Tracker — PDF adjustment design brief",
+    "kind": "design-brief",
+    "body": "UX brief extending existing FMCS system only. Path: company-workspace/jpa-ap-tracker/design-brief-pdf-adjustment.md. Decisions: default one payable/one check with advanced split option; PDC schedule rows summing to net; workflow stepper read-only + StatusSelect transitions; gate by workflow∩assignee∩payable_status_ids; formatMoney commas with blur preview; AR due filters + invoice search; always show count·total; Download monthly summary + Export monthly sales report buttons.",
+    "createdAt": "2026-11-27T06:22:06.720Z",
+    "sessionId": "ses_704c2df902448eb48eb76eb2",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwylsb18_wscbnh",
+    "role": "engineer",
+    "title": "JPA AP/AR Tracker — PDF adjustment implementation",
+    "kind": "product-build",
+    "body": "Implemented full PDF adjustment in company-workspace/jpa-ap-tracker. Migration 035 (payable_pdc_lines, Jeanette/Crissa permissions, admin display Jea). Server: For review on create, payable_status_ids enforcement, PDC CRUD+sum validation, AR search/dueFrom/dueTo. Client: WorkflowStepper, PdcSchedulePanel, comma amounts, AR totals + monthly summary/sales Excel. typecheck+build+56 tests PASS. Tech notes: jpa-ap-tracker/tech-notes-pdf-adjustment.md. Residual: apply 035 on DB; manual E2E not run; Excel columns ASSUMED.",
+    "createdAt": "2026-11-27T06:31:27.452Z",
+    "sessionId": "ses_704c2df902448eb48eb76eb2",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwylscjs_ksiesn",
+    "role": "qa",
+    "title": "JPA AP/AR Tracker — PDF adjustment QA readiness",
+    "kind": "qa-plan",
+    "body": "CONDITIONAL GO. Plan: jpa-ap-tracker/qa-pdf-adjustment-plan.md. Readiness: jpa-ap-tracker/qa-pdf-adjustment-readiness.md. Code gates PASS for For review default, status permission enforcement, PDC, AR filters/exports. Failed incomplete: G3 E2E AP workflow and G9 runtime smoke not executed. Blocked until migration 035 applied + re-login + manual role matrix smoke.",
+    "createdAt": "2026-11-27T06:31:29.417Z",
+    "sessionId": "ses_704c2df902448eb48eb76eb2",
+    "machine": "DESKTOP-1J3PTJN"
   }
 ]

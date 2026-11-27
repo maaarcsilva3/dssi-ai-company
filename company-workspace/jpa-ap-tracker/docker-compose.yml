@@ -1,0 +1,59 @@
+# Local/root serving: build with `npm run build:docker` (BASE_PATH=/), then `docker compose up -d`.
+# Do not use the default `npm run build` here — that targets /dev/ap-tracker/ behind nginx.
+# After rebuild while containers are running, recreate so the ./dist bind mount remounts:
+#   docker compose up -d --force-recreate app
+# No Dockerfile needed: the app runs the prebuilt bundle on the stock Node image.
+#
+# Data persistence (server-safe):
+#   Named volumes `pgdata` (Postgres) and `uploads` (attachments) survive
+#   `docker compose down` and `docker compose up -d`.
+#   Do NOT use `docker compose down -v` on the server — `-v` deletes those volumes.
+#   App code comes from the `./dist` bind mount; rebuild + recreate app to ship new builds.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: aptracker
+      POSTGRES_USER: ap
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ap_secret}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ap -d aptracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  app:
+    image: node:22-alpine
+    working_dir: /app
+    command: ["node", "--enable-source-maps", "--env-file=.env", "server/index.cjs"]
+    volumes:
+      - ./dist:/app:ro
+      - uploads:/data/uploads
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://ap:${DB_PASSWORD:-ap_secret}@db:5432/aptracker
+      UPLOAD_DIR: /data/uploads
+      MIGRATIONS_DIR: /app/migrations
+      PUBLIC_DIR: /app/public
+      AI_CONTEXT_PATH: /app/ai/report-context.md
+      PORT: 8080
+      TZ: Asia/Manila
+    ports:
+      - "${APP_PORT:-8067}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+volumes:
+  pgdata: {}
+  uploads: {}

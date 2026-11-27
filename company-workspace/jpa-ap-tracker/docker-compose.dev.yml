@@ -1,0 +1,23 @@
+# Local API/Vite development: Postgres only, published on localhost:5432.
+# Usage: npm run db:up && npm run dev
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: aptracker
+      POSTGRES_USER: ap
+      # Keep local password aligned with .env DATABASE_URL (do not reuse production DB_PASSWORD).
+      POSTGRES_PASSWORD: ap_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ap -d aptracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata_dev: {}
