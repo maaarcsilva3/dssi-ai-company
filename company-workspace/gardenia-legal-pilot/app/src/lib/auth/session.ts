@@ -21,12 +21,17 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   };
 }
 
+function resolveCookiePath(): string {
+  const cp = process.env.COOKIE_PATH;
+  if (cp !== undefined && cp !== "") return cp;
+  const bp = process.env.NEXT_PUBLIC_BASE_PATH;
+  if (bp !== undefined && bp !== "" && bp !== "/") return bp;
+  return "/";
+}
+
 export async function setSessionUser(userId: string) {
   const cookieStore = await cookies();
-  const cookiePath =
-    process.env.COOKIE_PATH ||
-    process.env.NEXT_PUBLIC_BASE_PATH ||
-    "/dev/gardenia-legal-pilot";
+  const cookiePath = resolveCookiePath();
   cookieStore.set(COOKIE_NAME, userId, {
     httpOnly: true,
     sameSite: "lax",
@@ -37,10 +42,7 @@ export async function setSessionUser(userId: string) {
 
 export async function clearSession() {
   const cookieStore = await cookies();
-  const cookiePath =
-    process.env.COOKIE_PATH ||
-    process.env.NEXT_PUBLIC_BASE_PATH ||
-    "/dev/gardenia-legal-pilot";
+  const cookiePath = resolveCookiePath();
   cookieStore.delete({ name: COOKIE_NAME, path: cookiePath });
 }
 

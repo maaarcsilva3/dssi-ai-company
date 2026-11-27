@@ -1,0 +1,14 @@
+# Merge with docker-compose.yml when restoring public URL behind host nginx:
+#   https://ds-solutionsinc.com/dev/gardenia-legal-pilot/
+#
+#   docker compose -f docker-compose.yml -f docker-compose.nginx-subpath.yml up --build -d
+#
+# Host nginx (deferred for IP-root smoke): see README.md § Host nginx
+
+services:
+  gardenia-legal-pilot:
+    build:
+      args:
+        NEXT_PUBLIC_BASE_PATH: /dev/gardenia-legal-pilot
+    environment:
+      COOKIE_PATH: /dev/gardenia-legal-pilot

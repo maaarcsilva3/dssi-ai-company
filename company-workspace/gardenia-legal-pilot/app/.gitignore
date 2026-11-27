@@ -22,6 +22,7 @@
 
 # local sqlite
 /data/
+# starter.db at app root is committed (portable seed for Docker COPY)
 
 # misc
 .DS_Store

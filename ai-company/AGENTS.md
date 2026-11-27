@@ -20,7 +20,10 @@ Run the CLI under Node, never Bun.
 - `bot/instructions.md` — COO always-on prompt
 - `bot/subagents/<role>/` — employee specialists (task tool)
 - `bot/tools/` — roster + deliverable storage
-- `bot/skills/` — run-objective, ceo-report
+- `bot/skills/` — run-objective, ceo-report, playbooks
+- `bot/extensions/pstack.ts` — Lauren Tan pstack (`plugins/pstack`) → `pstack__*`
+- `bot/extensions/cursor-team-kit.ts` — Cursor Team Kit companion (`plugins/cursor-team-kit`) → `cursor-team-kit__*` (deslop, control-ui/cli, …)
+- `plugins/` — vendored Cursor plugins (update from upstream; do not edit lightly)
 - `bot/channels/ceo.ts` — dashboard HTTP API
 - `evals/` — filesystem evals
 

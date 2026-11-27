@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 if ! docker info >/dev/null 2>&1; then
-  echo "ERROR: Docker daemon is required to build Linux dist (better-sqlite3 is platform-specific)." >&2
+  echo "ERROR: Docker daemon is required to build Linux dist (Next standalone image)." >&2
   exit 1
 fi
 
@@ -16,9 +16,11 @@ mkdir -p dist
 
 export DOCKER_BUILDKIT=1
 PLATFORM="${DIST_PLATFORM:-linux/amd64}"
+BASE_PATH="${NEXT_PUBLIC_BASE_PATH:-/dev/gardenia-legal-pilot}"
 
 docker build \
   --platform "$PLATFORM" \
+  --build-arg "NEXT_PUBLIC_BASE_PATH=${BASE_PATH}" \
   -f app/Dockerfile.dist \
   --target export \
   --output "type=local,dest=./dist" \
@@ -32,7 +34,7 @@ fi
 # starter.db: portable SQLite file (no native code). Built on the host to avoid qemu+sqlite
 # segfaults when cross-compiling amd64 on Apple Silicon; runtime reads it on Linux only.
 echo "Building starter.db (schema + seed on build host)…"
-if [[ ! -d app/node_modules/better-sqlite3 ]]; then
+if [[ ! -d app/node_modules/drizzle-orm ]]; then
   (cd app && npm ci)
 fi
 rm -f dist/starter.db

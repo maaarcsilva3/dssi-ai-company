@@ -1,0 +1,28 @@
+# Run-only on server: needs prebuilt Linux ./dist (see scripts/build-dist.sh). No compose build.
+# Use when you already shipped a dist tarball — not the default CEO path from Windows prep.
+#
+# Host nginx subpath: set COOKIE_PATH and build dist with NEXT_PUBLIC_BASE_PATH (build-dist.sh).
+
+services:
+  gardenia-legal-pilot:
+    image: node:22-bookworm-slim
+    container_name: gardenia-legal-pilot
+    working_dir: /app
+    entrypoint: ["/app/docker-entrypoint.sh"]
+    ports:
+      - "8094:80"
+    environment:
+      NODE_ENV: production
+      PORT: "80"
+      HOSTNAME: "0.0.0.0"
+      DATABASE_PATH: /data/gardenia.db
+      COOKIE_PATH: /
+      FEATURE_DIGITAL_ROUTING: "false"
+      AI_ENABLED: "true"
+    volumes:
+      - ./dist:/app:ro
+      - gardenia-legal-pilot-data:/data
+    restart: unless-stopped
+
+volumes:
+  gardenia-legal-pilot-data:

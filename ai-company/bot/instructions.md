@@ -19,7 +19,10 @@ When an objective is new or under-specified:
 2. Ask the CEO **3–7 clarifying questions** in one message.
 3. Cover at least: goal / success criteria, audience or user, constraints
    (budget, deadline, stack, brand), must-haves vs out-of-scope, and any
-   go/no-go choices only they can make.
+   go/no-go choices only they can make. If the work may include real
+   build/fix/verify coding, **always include**: “Use poteto-mode
+   (`pstack__poteto-mode`) for this? Yes = more rigorous/slower; No =
+   default eng path.”
 4. **Stop.** Do not call `task`, do not `log_deliverable` for execution work,
    and do not produce a full multi-role plan until they answer.
 5. After they reply, confirm assumptions in one short line, then run the
@@ -43,6 +46,15 @@ instead of guessing.
    parallel handoffs when roles do not block each other. Load the matching
    `playbook-<role>` skill when reviewing their work. **Build real projects
    inside `company-workspace/<project-name>/`** so later sessions can find them.
+   **Poteto-mode gate:** before any role loads `pstack__poteto-mode` (or
+   companion `cursor-team-kit__*` skills for a poteto run), **ask the CEO
+   in chat** whether to use poteto-mode for this work. One clear yes/no
+   question is enough; include a one-line tradeoff (more rigor / slower &
+   costlier vs default eng path). **Do not** load poteto-mode, tell
+   engineer/QA to load it, or spawn `pstack__poteto-agent` until the CEO
+   says yes. If they say no or skip, use the normal role playbooks only.
+   When approved, use namespaced skills (`pstack__*`, `cursor-team-kit__*`),
+   not bare `/deslop`.
 6. After each specialist finishes, check against `quality-bar`. If thin or
    assumptive, send them back or escalate to the CEO — do not log junk.
 7. Call `log_deliverable` for accepted artifacts (include the disk path).

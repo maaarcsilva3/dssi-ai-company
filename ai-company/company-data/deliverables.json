@@ -338,5 +338,205 @@
     "createdAt": "2026-11-26T05:49:35.765Z",
     "sessionId": "ses_ed4ab5efe5ae317108d48146",
     "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwycppd0_qzt9qz",
+    "role": "engineer",
+    "title": "Gardenia Legal Pilot — IP-root server-build deploy profile",
+    "kind": "tech-plan",
+    "body": "Implemented temporary IP-root default: docker compose up --build -d on server; COOKIE_PATH=/; empty NEXT_PUBLIC_BASE_PATH at build. Flip-back: docker-compose.nginx-subpath.yml. Files: app/Dockerfile, docker-compose.yml, next.config.ts, session.ts, README.md.",
+    "createdAt": "2026-11-27T02:17:29.508Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwycqrd8_j3rev1",
+    "role": "engineer",
+    "title": "Gardenia Legal — IP-root server-build deploy",
+    "kind": "tech-plan",
+    "body": "Temporary IP-root profile for http://193.203.161.251:8094/ (no nginx/HTTPS). Default docker-compose.yml builds on server from app/Dockerfile (empty NEXT_PUBLIC_BASE_PATH, COOKIE_PATH=/). Flip-back: docker-compose.nginx-subpath.yml. Legacy dist: docker-compose.dist-run.yml. next.config.ts omits basePath when empty. Copy source to server → docker compose up --build -d. Dist not required on Windows. Paths: gardenia-legal-pilot/docker-compose.yml, app/Dockerfile, README.md.",
+    "createdAt": "2026-11-27T02:18:18.764Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwycqsw4_okcx4o",
+    "role": "qa",
+    "title": "Gardenia Legal — IP-root deploy readiness",
+    "kind": "qa-plan",
+    "body": "CONDITIONAL GO to copy and run on server. Artifact review PASS for IP-root compose, Dockerfile, cookie Path=/, flip-back overlay. Blocked until server G1–G6: compose up --build, stable logs, loopback + public http://193.203.161.251:8094/login with session Path=/. Report: company-workspace/gardenia-legal-pilot/qa-ip-root-deploy-readiness.md",
+    "createdAt": "2026-11-27T02:18:20.740Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwyd6ql2_t4xxuq",
+    "role": "engineer",
+    "title": "Gardenia Docker build fix — starter.db COPY pattern",
+    "kind": "tech-plan",
+    "body": "Removed npm run db:setup/db:seed from app/Dockerfile builder (SIGSEGV 139). Image requires app/starter.db in build context; committed 77KB seed DB generated on Windows. Added scripts/build-starter-db.sh and .ps1 for host regeneration. README updated with server steps. Entrypoint unchanged.",
+    "createdAt": "2026-11-27T02:30:44.246Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwyd74io_5xdrg9",
+    "role": "engineer",
+    "title": "Gardenia — fix Docker seed exit 139",
+    "kind": "tech-plan",
+    "body": "Removed db:setup/db:seed from Docker builder (SIGSEGV 139 with tsx+better-sqlite3). Ship portable app/starter.db (~78KB) COPY’d into image; host scripts build-starter-db.ps1/.sh to regenerate. README updated. Re-copy tree including app/starter.db then docker compose up --build -d.",
+    "createdAt": "2026-11-27T02:31:02.304Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwydc4yf_41rd8h",
+    "role": "engineer",
+    "title": "Gardenia — fix entrypoint CRLF crash",
+    "kind": "tech-plan",
+    "body": "Container failed with exec /app/docker-entrypoint.sh: no such file or directory due to Windows CRLF shebang. Converted docker-entrypoint*.sh to LF; Dockerfile now sed-strips CR before chmod; .gitattributes forces LF for *.sh. Re-tar/scp app entrypoints + Dockerfile and rebuild.",
+    "createdAt": "2026-11-27T02:34:56.151Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwydksed_y2peuf",
+    "role": "engineer",
+    "title": "Gardenia — fix runtime better-sqlite3 exit 139",
+    "kind": "tech-plan",
+    "body": "Next Ready then exit 139: partial traced better-sqlite3 in standalone. Runner now npm ci --omit=dev in /tmp and replaces node_modules/better-sqlite3 with full Linux .node; entrypoint preflight opens DATABASE_PATH before server.js. Re-copy Dockerfile + docker-entrypoint.dist.sh; docker compose build --no-cache && up -d.",
+    "createdAt": "2026-11-27T02:41:39.781Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwydyo8i_f5uuv8",
+    "role": "engineer",
+    "title": "Gardenia — replace better-sqlite3 with node:sqlite",
+    "kind": "tech-plan",
+    "body": "Removed better-sqlite3 (Docker SIGSEGV 139). App uses Node 22 DatabaseSync (node:sqlite) + drizzle-orm/node-sqlite (1.0.0-rc.6). Docker images node:22-bookworm-slim; no native g++/rebuild. NODE_OPTIONS=--experimental-sqlite. Regenerate/ship starter.db. CEO: re-tar, docker compose down -v, build --no-cache, up -d. Smoke http://193.203.161.251:8094/login",
+    "createdAt": "2026-11-27T02:52:27.570Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwylg85o_6fatw5",
+    "role": "product-manager",
+    "title": "JPA AP/AR Tracker — PDF adjustment product brief",
+    "kind": "product-brief",
+    "body": "Full PDF must-have brief for JPA AP/AR Tracker. Path: company-workspace/jpa-ap-tracker/product-brief-pdf-adjustment.md. Scope: AP multi-invoice+PDCs, multi-invoice one check, Jeanette→Jea(admin)→Crissa→Jeanette status workflow with permission enforcement, comma amounts, AR due date/search/MM-DD-YYYY, invoice count+totals, monthly summary Excel, monthly sales report Excel. Out of scope: Telegram/AI/liquidations/petty cash/etc. ASSUMPTION: Jea=admin; Excel layouts from existing AR fields. Deadline today. CEO blockers: none.",
+    "createdAt": "2026-11-27T06:22:03.852Z",
+    "sessionId": "ses_704c2df902448eb48eb76eb2",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwylgadc_3zklvq",
+    "role": "designer",
+    "title": "JPA AP/AR Tracker — PDF adjustment design brief",
+    "kind": "design-brief",
+    "body": "UX brief extending existing FMCS system only. Path: company-workspace/jpa-ap-tracker/design-brief-pdf-adjustment.md. Decisions: default one payable/one check with advanced split option; PDC schedule rows summing to net; workflow stepper read-only + StatusSelect transitions; gate by workflow∩assignee∩payable_status_ids; formatMoney commas with blur preview; AR due filters + invoice search; always show count·total; Download monthly summary + Export monthly sales report buttons.",
+    "createdAt": "2026-11-27T06:22:06.720Z",
+    "sessionId": "ses_704c2df902448eb48eb76eb2",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwylsb18_wscbnh",
+    "role": "engineer",
+    "title": "JPA AP/AR Tracker — PDF adjustment implementation",
+    "kind": "product-build",
+    "body": "Implemented full PDF adjustment in company-workspace/jpa-ap-tracker. Migration 035 (payable_pdc_lines, Jeanette/Crissa permissions, admin display Jea). Server: For review on create, payable_status_ids enforcement, PDC CRUD+sum validation, AR search/dueFrom/dueTo. Client: WorkflowStepper, PdcSchedulePanel, comma amounts, AR totals + monthly summary/sales Excel. typecheck+build+56 tests PASS. Tech notes: jpa-ap-tracker/tech-notes-pdf-adjustment.md. Residual: apply 035 on DB; manual E2E not run; Excel columns ASSUMED.",
+    "createdAt": "2026-11-27T06:31:27.452Z",
+    "sessionId": "ses_704c2df902448eb48eb76eb2",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwylscjs_ksiesn",
+    "role": "qa",
+    "title": "JPA AP/AR Tracker — PDF adjustment QA readiness",
+    "kind": "qa-plan",
+    "body": "CONDITIONAL GO. Plan: jpa-ap-tracker/qa-pdf-adjustment-plan.md. Readiness: jpa-ap-tracker/qa-pdf-adjustment-readiness.md. Code gates PASS for For review default, status permission enforcement, PDC, AR filters/exports. Failed incomplete: G3 E2E AP workflow and G9 runtime smoke not executed. Blocked until migration 035 applied + re-login + manual role matrix smoke.",
+    "createdAt": "2026-11-27T06:31:29.417Z",
+    "sessionId": "ses_704c2df902448eb48eb76eb2",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwz2dfxy_50qo56",
+    "role": "engineer",
+    "title": "JPA AP/AR — PDC draft, comma amounts, AR due date",
+    "kind": "product-build",
+    "body": "Three CEO fixes in company-workspace/jpa-ap-tracker.\n\n1) PDC draft retention: draft create/update persists pdc_lines when sent; PayableFormPage always sends/loads PDC on draft; panel visible when stored PDC exists. Root cause: draft create only saved when length truthy + client omit + panel gated on unloaded methods.\n2) Comma amounts: formatAmountOnBlur app-wide on money inputs (payable, PDC, source accounts, liquidations, petty cash, AR); displays keep formatMoney.\n3) Receivables Billing lines: Due date column after Receiving date via summary_due_date + formatDateMdY.\n\nnpm test 56 PASS; typecheck PASS. Docker dist rebuilt BASE_PATH=/ and app recreated healthy on :8080.\nNotes: jpa-ap-tracker/tech-notes-followup-pdc-comma-due.md",
+    "createdAt": "2026-11-27T14:15:47.446Z",
+    "sessionId": "ses_a4b1d7c0022ec1c56f8b39a6",
+    "machine": "DESKTOP-R6GIOJ5"
+  },
+  {
+    "id": "del_mwz2dh86_ge9c1v",
+    "role": "qa",
+    "title": "JPA follow-up — PDC/comma/due QA readiness",
+    "kind": "qa-plan",
+    "body": "CONDITIONAL GO. Code gates PASS for PDC draft persist, comma blur, AR Due date column order. G7 CEO 5-min smoke NOT RUN. Report: jpa-ap-tracker/qa-followup-pdc-comma-due.md. Residual: no automated PDC round-trip test; batch create still omits pdc_lines; due date is summary parent date.",
+    "createdAt": "2026-11-27T14:15:49.110Z",
+    "sessionId": "ses_a4b1d7c0022ec1c56f8b39a6",
+    "machine": "DESKTOP-R6GIOJ5"
+  },
+  {
+    "id": "del_mwz3gkbw_es00hm",
+    "role": "engineer",
+    "title": "JPA — fix draft PDC wipe + draft submit assignee 403",
+    "kind": "product-build",
+    "body": "Root causes confirmed with live DB/API.\n\n1) Draft submit 403: drafts keep assigned_to=null; PUT submit status change called assertCanChangeAssignedStatus(null) → 403 for creator. Fix: skip assignee check when existing.is_draft && !input.is_draft (edit access already gated).\n\n2) PDC wipe: server persists when pdc_lines sent (API ok); UI often sent [] / omitted lines and replace DELETE wiped rows. Fix: client always send filtered PDC for PDC method, auto-seed line, omit body when edit pending load; draft PUT preserves DB rows when pdc_lines empty; comma-safe amount parse.\n\nVerified: npm test 58 PASS; typecheck PASS; API create draft+PDC refetch; empty-array draft PUT preserves; Jeanette draft submit → For review assigned=self. Docker app healthy on :8080.\nNotes: jpa-ap-tracker/tech-notes-pdc-draft-assignee-fix.md",
+    "createdAt": "2026-11-27T14:46:12.716Z",
+    "sessionId": "ses_a4b1d7c0022ec1c56f8b39a6",
+    "machine": "DESKTOP-R6GIOJ5"
+  },
+  {
+    "id": "del_mwz4kmtv_kiu48r",
+    "role": "engineer",
+    "title": "JPA — per-invoice PDC schedules",
+    "kind": "product-build",
+    "body": "CEO-approved redesign (poteto-mode): PDC belongs to each invoice, not payable-level sibling panel.\n\nMigration 036: payable_pdc_lines.payable_invoice_id NOT NULL + composite FK. Legacy rows backfilled to first invoice.\nAPI: invoices[].pdc_lines on GET/POST/PUT; per-invoice sum = invoice net; top-level pdc_lines removed.\nUI: PdcSchedulePanel inside each invoice row; edit loads nested lines (fixes blank #131).\nVerified: 66 tests PASS; prove-pdc-per-invoice.mjs 24/24; GET #131 shows pdc1; Docker healthy :8080.\nNotes: jpa-ap-tracker/tech-notes-pdc-per-invoice.md\nDraft #132 still has 0 PDC rows (never saved under old model) — re-enter once.",
+    "createdAt": "2026-11-27T15:17:22.195Z",
+    "sessionId": "ses_a4b1d7c0022ec1c56f8b39a6",
+    "machine": "DESKTOP-R6GIOJ5"
+  },
+  {
+    "id": "del_mwz67e6v_vc4eq9",
+    "role": "engineer",
+    "title": "JPA — shared + per-invoice PDC mix",
+    "kind": "product-build",
+    "body": "Poteto-mode feature: payable can mix exclusive per-invoice PDC schedules (1+ lines per invoice) with shared single-check PDCs (N invoices → 1 PDC, amount = sum of member nets). Multiple shared groups OK. One row per invoice; SharedPdcModal for attach list.\n\nMigration 037: payable_pdc_groups + payable_pdc_group_invoices. savePdcPlan single writer. GET invoices[].pdc_group + top-level pdc_groups.\n\nVerified: 78 tests PASS; prove-pdc-shared.mjs 19/19; Docker healthy :8080. Modal not hand-clicked in browser (typecheck + unit + bundle evidence).\nNotes: jpa-ap-tracker/tech-notes-pdc-shared-and-per-invoice.md",
+    "createdAt": "2026-11-27T16:03:03.703Z",
+    "sessionId": "ses_a4b1d7c0022ec1c56f8b39a6",
+    "machine": "DESKTOP-R6GIOJ5"
+  },
+  {
+    "id": "del_mwz7xgqz_8nvwjt",
+    "role": "engineer",
+    "title": "JPA — Separate payable PDC modes A/B",
+    "kind": "product-build",
+    "body": "When Separate payable per invoice + PDC: two modes.\nA) PDC per invoice — panel on each row; batch N payables with distinct schedules.\nB) One PDC for all — outside block (no/date, amount=sum nets); inline PDC disabled; batch N payables same pdc_no/date, each line amount=invoice net.\nSeparate off unchanged.\n81 tests PASS; prove-pdc-separate-batch.mjs PASS; Docker healthy :8080.\nNotes: jpa-ap-tracker/tech-notes-pdc-separate-batch-modes.md",
+    "createdAt": "2026-11-27T16:51:19.691Z",
+    "sessionId": "ses_a4b1d7c0022ec1c56f8b39a6",
+    "machine": "DESKTOP-R6GIOJ5"
+  },
+  {
+    "id": "del_mwz8jbg4_gb15am",
+    "role": "engineer",
+    "title": "JPA — linked One-PDC-for-all batch sync",
+    "kind": "product-build",
+    "body": "Separate + One PDC for all now stores payable_shared_pdc_batches + payables.shared_pdc_batch_id. Edit any sibling shows locked One-PDC-for-all UI with member list; PUT syncs pdc_no/date to all siblings and recomputes each line amount = payable net. Unlink / per-invoice override rejected 403. 84 tests PASS; prove-pdc-shared-batch-link.mjs PASS; Docker :8080 healthy with 038. Notes: tech-notes-pdc-shared-batch-link.md. Pre-038 drafts need recreate to get batch id.",
+    "createdAt": "2026-11-27T17:08:19.252Z",
+    "sessionId": "ses_a4b1d7c0022ec1c56f8b39a6",
+    "machine": "DESKTOP-R6GIOJ5"
+  },
+  {
+    "id": "del_mwz947np_ja0woq",
+    "role": "engineer",
+    "title": "AR Monthly Summary year-pivot Excel",
+    "kind": "product-build",
+    "body": "Download monthly summary is now Company × Jan–Dec pivot of grand_total for the year of the month filter; empty months 0.00; ignores client/search filters; Grand Total row. GET /api/ar/summaries/year-pivot?year=YYYY. Removed Export monthly sales report. 85 tests PASS; Docker healthy :8080. Notes: tech-notes-ar-monthly-summary-pivot.md",
+    "createdAt": "2026-11-27T17:24:34.117Z",
+    "sessionId": "ses_a4b1d7c0022ec1c56f8b39a6",
+    "machine": "DESKTOP-R6GIOJ5"
   }
 ]

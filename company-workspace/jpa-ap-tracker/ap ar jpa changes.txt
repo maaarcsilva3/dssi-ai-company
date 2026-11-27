@@ -1,0 +1,101 @@
+ui changes:
+	make it like a form style ui for inputs
+	
+
+to add features:
+	notifications per user assigned to them
+	liquidation tracking,
+	petty cash (i want here monthly report of truck allowance)
+ 
+ 
+	
+	
+changes for accounts payable:
+
+	Invoice number should be unique
+	Delivery receipt number from fuel should be unique
+
+	display the history of movement of status, update, etc
+
+
+	1 invoice seprate entries  with seperate terms 
+	multiple invoice = 1 payment, but still retain invoice number as unique
+
+
+	status flow:
+		for release -> create check for deposit -> deposited
+
+	basta hindi naka assign sa user, hindi ma uupdate ang status, kasi ang status naka bind na per user
+
+
+	status is bind to user account, if in setting, if selected change payable status, sub option for the selected status on what he can do
+
+	
+
+
+	upon submit of entry of payables-> checkbox for draft only, kapag draft only pwede pa ma edit ng nag create ng payable.  use save button to show in entry (draft is not calculated)| save and submit = final
+
+
+
+	
+	status: 
+		if staff create new, automatic status = unpaid
+		
+
+
+
+	excel report to generate -> replace print
+	payee, check no, check date, amount, source account
+
+
+
+	if update status to paid, add check date
+	
+
+
+change the accounts receivables entirely for this
+for accounts receivables:
+	tab for detailed entries
+	tab for summary per account per month
+	supplier list CRUD
+	
+	entries for detailed entries:
+		invoice number
+		date
+		reference
+		origin
+		destination
+		amount
+		
+	entries for summary: 
+
+		billing reference number
+		trip type (IIS/LUZON/CROSSDOCK)
+		trip classification (FORWARD HAUL/BACK HAUL)
+		fleet type (10W/6W)
+		service type (ON-CALL/WETLEASE
+		date coverage (date)
+		compute for the following automatically
+			Total Sales (VATex)
+			Plus 12% VAT
+			Total Sales (VATinc)
+			Less (-) 2% EWT
+			Total 
+			Grand Total
+
+	
+	for entries of summary per account  per month, use the invoice number from detailed entries as the key for grouping. 
+	
+	make a function for this:																	
+		upload excel file -> create entry for detailed tab
+	
+	
+	
+	client | trip classification  -> bound to client , can override
+	
+	this ar can only be seen by admin and a user granted access for viewing and editting 
+	
+	deduction charges is manual entry after uploading
+	
+	separate status for 2307 (ewt) -> pending then submit whith submitted with date 
+	
