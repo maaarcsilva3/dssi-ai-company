@@ -338,5 +338,85 @@
     "createdAt": "2026-11-26T05:49:35.765Z",
     "sessionId": "ses_ed4ab5efe5ae317108d48146",
     "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwycppd0_qzt9qz",
+    "role": "engineer",
+    "title": "Gardenia Legal Pilot — IP-root server-build deploy profile",
+    "kind": "tech-plan",
+    "body": "Implemented temporary IP-root default: docker compose up --build -d on server; COOKIE_PATH=/; empty NEXT_PUBLIC_BASE_PATH at build. Flip-back: docker-compose.nginx-subpath.yml. Files: app/Dockerfile, docker-compose.yml, next.config.ts, session.ts, README.md.",
+    "createdAt": "2026-11-27T02:17:29.508Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwycqrd8_j3rev1",
+    "role": "engineer",
+    "title": "Gardenia Legal — IP-root server-build deploy",
+    "kind": "tech-plan",
+    "body": "Temporary IP-root profile for http://193.203.161.251:8094/ (no nginx/HTTPS). Default docker-compose.yml builds on server from app/Dockerfile (empty NEXT_PUBLIC_BASE_PATH, COOKIE_PATH=/). Flip-back: docker-compose.nginx-subpath.yml. Legacy dist: docker-compose.dist-run.yml. next.config.ts omits basePath when empty. Copy source to server → docker compose up --build -d. Dist not required on Windows. Paths: gardenia-legal-pilot/docker-compose.yml, app/Dockerfile, README.md.",
+    "createdAt": "2026-11-27T02:18:18.764Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwycqsw4_okcx4o",
+    "role": "qa",
+    "title": "Gardenia Legal — IP-root deploy readiness",
+    "kind": "qa-plan",
+    "body": "CONDITIONAL GO to copy and run on server. Artifact review PASS for IP-root compose, Dockerfile, cookie Path=/, flip-back overlay. Blocked until server G1–G6: compose up --build, stable logs, loopback + public http://193.203.161.251:8094/login with session Path=/. Report: company-workspace/gardenia-legal-pilot/qa-ip-root-deploy-readiness.md",
+    "createdAt": "2026-11-27T02:18:20.740Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwyd6ql2_t4xxuq",
+    "role": "engineer",
+    "title": "Gardenia Docker build fix — starter.db COPY pattern",
+    "kind": "tech-plan",
+    "body": "Removed npm run db:setup/db:seed from app/Dockerfile builder (SIGSEGV 139). Image requires app/starter.db in build context; committed 77KB seed DB generated on Windows. Added scripts/build-starter-db.sh and .ps1 for host regeneration. README updated with server steps. Entrypoint unchanged.",
+    "createdAt": "2026-11-27T02:30:44.246Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwyd74io_5xdrg9",
+    "role": "engineer",
+    "title": "Gardenia — fix Docker seed exit 139",
+    "kind": "tech-plan",
+    "body": "Removed db:setup/db:seed from Docker builder (SIGSEGV 139 with tsx+better-sqlite3). Ship portable app/starter.db (~78KB) COPY’d into image; host scripts build-starter-db.ps1/.sh to regenerate. README updated. Re-copy tree including app/starter.db then docker compose up --build -d.",
+    "createdAt": "2026-11-27T02:31:02.304Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwydc4yf_41rd8h",
+    "role": "engineer",
+    "title": "Gardenia — fix entrypoint CRLF crash",
+    "kind": "tech-plan",
+    "body": "Container failed with exec /app/docker-entrypoint.sh: no such file or directory due to Windows CRLF shebang. Converted docker-entrypoint*.sh to LF; Dockerfile now sed-strips CR before chmod; .gitattributes forces LF for *.sh. Re-tar/scp app entrypoints + Dockerfile and rebuild.",
+    "createdAt": "2026-11-27T02:34:56.151Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwydksed_y2peuf",
+    "role": "engineer",
+    "title": "Gardenia — fix runtime better-sqlite3 exit 139",
+    "kind": "tech-plan",
+    "body": "Next Ready then exit 139: partial traced better-sqlite3 in standalone. Runner now npm ci --omit=dev in /tmp and replaces node_modules/better-sqlite3 with full Linux .node; entrypoint preflight opens DATABASE_PATH before server.js. Re-copy Dockerfile + docker-entrypoint.dist.sh; docker compose build --no-cache && up -d.",
+    "createdAt": "2026-11-27T02:41:39.781Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
+  },
+  {
+    "id": "del_mwydyo8i_f5uuv8",
+    "role": "engineer",
+    "title": "Gardenia — replace better-sqlite3 with node:sqlite",
+    "kind": "tech-plan",
+    "body": "Removed better-sqlite3 (Docker SIGSEGV 139). App uses Node 22 DatabaseSync (node:sqlite) + drizzle-orm/node-sqlite (1.0.0-rc.6). Docker images node:22-bookworm-slim; no native g++/rebuild. NODE_OPTIONS=--experimental-sqlite. Regenerate/ship starter.db. CEO: re-tar, docker compose down -v, build --no-cache, up -d. Smoke http://193.203.161.251:8094/login",
+    "createdAt": "2026-11-27T02:52:27.570Z",
+    "sessionId": "ses_da12d7c495941dced5c64fd1",
+    "machine": "DESKTOP-1J3PTJN"
   }
 ]

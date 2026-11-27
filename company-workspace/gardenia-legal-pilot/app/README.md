@@ -4,6 +4,8 @@ Thin operations layer: intake → assignment pool → status timeline → routin
 
 ## Run (exact commands)
 
+Requires **Node.js 22.5+** (`node:sqlite`). No `better-sqlite3`.
+
 ```bash
 cd app
 npm install
@@ -12,7 +14,9 @@ npm run db:seed
 npm run dev
 ```
 
-Open [http://localhost:3000/dev/gardenia-legal-pilot/](http://localhost:3000/dev/gardenia-legal-pilot/) (app uses base path `/dev/gardenia-legal-pilot`).
+Open [http://localhost:3000/](http://localhost:3000/) (default deploy profile is IP-root — no base path).
+
+For nginx subpath parity, run dev with `NEXT_PUBLIC_BASE_PATH=/dev/gardenia-legal-pilot` and open [http://localhost:3000/dev/gardenia-legal-pilot/](http://localhost:3000/dev/gardenia-legal-pilot/).
 
 **Docker / public deploy:** build Linux `dist/` via [../scripts/build-dist.sh](../scripts/build-dist.sh), then copy `dist/` + [../docker-compose.yml](../docker-compose.yml) to the server — see [../README.md](../README.md).
 
@@ -49,7 +53,7 @@ Open [http://localhost:3000/dev/gardenia-legal-pilot/](http://localhost:3000/dev
 
 ## Stack
 
-Next.js 15 App Router · TypeScript · Tailwind v4 · SQLite (`better-sqlite3`) · cookie session demo auth
+Next.js 15 App Router · TypeScript · Tailwind v4 · SQLite (`node:sqlite` / Node **22.5+**) · cookie session demo auth
 
 ## Reseed
 

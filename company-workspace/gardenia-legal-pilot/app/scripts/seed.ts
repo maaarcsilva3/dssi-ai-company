@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import type { SQLInputValue } from "node:sqlite";
 import { getSqlite } from "../src/lib/db";
 import { computeExpiryBucket } from "../src/lib/matters/expiry";
 
@@ -192,6 +193,7 @@ INSERT INTO matters (
   @printed_copy_issued_at, @latest_artifact_url, @latest_artifact_label, @on_hold_reason,
   @submitted_by_user_id, @internal_notes, @created_at, @updated_at
 )`);
+insertMatter.setAllowBareNamedParameters(true);
 
 const insertAudit = sqlite.prepare(`
 INSERT INTO audit_events (id, matter_id, actor_user_id, actor_name, event_type, before_json, after_json, note, occurred_at)
@@ -203,34 +205,35 @@ for (const m of seedMatters) {
   const end = m.end as string | null;
   const bucket = computeExpiryBucket(end);
   const ts = iso();
-  insertMatter.run({
+  const matterRow: Record<string, SQLInputValue> = {
     id,
-    matter_number: m.num,
-    entity_id: m.entity,
-    department_id: m.dept,
-    title: m.title,
-    contract_type: m.type,
-    counterparty: m.party,
+    matter_number: m.num as string,
+    entity_id: m.entity as string,
+    department_id: m.dept as string,
+    title: m.title as string,
+    contract_type: m.type as string,
+    counterparty: m.party as string,
     proponent_name: "Demo Proponent",
     priority: "normal",
-    status: m.status,
-    assignee_user_id: m.assignee,
-    google_doc_url: m.gdoc,
+    status: m.status as string,
+    assignee_user_id: (m.assignee as string | null) ?? null,
+    google_doc_url: (m.gdoc as string | null) ?? null,
     system_of_record: m.gdoc ? "gdocs" : "physical",
     effectivity_start: dateStr(-365),
     effectivity_end: end,
     expiry_bucket: bucket,
-    physical_custody: m.custody,
-    custody_note: m.custodyNote ?? null,
-    printed_copy_issued_at: m.printed,
-    latest_artifact_url: m.gdoc,
+    physical_custody: (m.custody as string | null) ?? null,
+    custody_note: (m.custodyNote as string | null) ?? null,
+    printed_copy_issued_at: (m.printed as string | null) ?? null,
+    latest_artifact_url: (m.gdoc as string | null) ?? null,
     latest_artifact_label: m.gdoc ? "Google Doc" : null,
     on_hold_reason: (m as { onHold?: string }).onHold ?? null,
     submitted_by_user_id: requester.id,
     internal_notes: null,
     created_at: ts,
     updated_at: ts,
-  });
+  };
+  insertMatter.run(matterRow);
   insertAudit.run(
     randomUUID(),
     id,

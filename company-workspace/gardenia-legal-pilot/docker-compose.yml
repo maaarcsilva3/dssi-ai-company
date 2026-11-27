@@ -1,11 +1,21 @@
-# Run-only on server: needs prebuilt Linux ./dist (see scripts/build-dist.sh). No build: context here.
-# Host nginx: proxy_pass http://127.0.0.1:8094; (no trailing slash — preserve Next.js basePath).
+# Temporary IP-root deploy (default): http://<host>:8094/ — no nginx required.
+#
+# CEO path on server: copy project (include app/starter.db) → docker compose up --build -d
+#
+# Flip-back to /dev/gardenia-legal-pilot (+ host nginx later):
+#   docker compose -f docker-compose.yml -f docker-compose.nginx-subpath.yml up --build -d
+#
+# Legacy prebuilt ./dist run-only (no server build): docker-compose.dist-run.yml
+
 services:
   gardenia-legal-pilot:
-    image: node:20-bookworm-slim
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_BASE_PATH: ""
+    image: gardenia-legal-pilot:local
     container_name: gardenia-legal-pilot
-    working_dir: /app
-    entrypoint: ["/app/docker-entrypoint.sh"]
     ports:
       - "8094:80"
     environment:
@@ -13,11 +23,11 @@ services:
       PORT: "80"
       HOSTNAME: "0.0.0.0"
       DATABASE_PATH: /data/gardenia.db
-      COOKIE_PATH: /dev/gardenia-legal-pilot
+      COOKIE_PATH: /
       FEATURE_DIGITAL_ROUTING: "false"
       AI_ENABLED: "true"
+      NODE_OPTIONS: --experimental-sqlite
     volumes:
-      - ./dist:/app:ro
       - gardenia-legal-pilot-data:/data
     restart: unless-stopped
 
